@@ -1,0 +1,383 @@
+/* KRAFTLOG 2.0 – lokale Verschlüsselung mit optionaler Cloud-Synchronisierung. */
+'use strict';
+const STORE = 'kraftlog.profiles.v1';
+const GROUPS = ['Alle','Brust','Rücken','Schultern','Beine','Bauch','Arme'];
+const EXERCISES = [
+  ['butterfly','Butterfly','Brust','Maschine','fly'],
+  ['brustpresse','Brustpresse','Brust','Maschine','chest'],
+  ['schraegpresse','Schrägbrustpresse','Brust','Maschine','chest'],
+  ['bankdruecken','Bankdrücken','Brust','Freihantel','bench'],
+  ['schraegbank','Schrägbank-Kurzhanteln','Brust','Freihantel','bench'],
+  ['kabelflys','Kabel-Flys','Brust','Kabelzug','fly'],
+  ['latzug','Latzug breit','Rücken','Maschine','lat'],
+  ['latzugeng','Latzug eng','Rücken','Maschine','lat'],
+  ['rudern','Rudern sitzend','Rücken','Maschine','row'],
+  ['rudernlh','Langhantelrudern','Rücken','Freihantel','hinge'],
+  ['klimmzuege','Klimmzüge','Rücken','Körpergewicht','pull'],
+  ['rueckenstrecker','Rückenstrecker','Rücken','Maschine','hinge'],
+  ['reversebutterfly','Reverse Butterfly','Schultern','Maschine','fly'],
+  ['schulterpresse','Schulterpresse','Schultern','Maschine','overhead'],
+  ['seitheben','Seitheben','Schultern','Freihantel','lateral'],
+  ['facepulls','Face Pulls','Schultern','Kabelzug','cable'],
+  ['beinpresse','Beinpresse','Beine','Maschine','legpress'],
+  ['beinstrecker','Beinstrecker','Beine','Maschine','legextension'],
+  ['beinbeuger','Beinbeuger','Beine','Maschine','legcurl'],
+  ['kniebeugen','Kniebeugen','Beine','Freihantel','squat'],
+  ['kreuzheben','Kreuzheben','Beine','Freihantel','hinge'],
+  ['abduktoren','Abduktoren','Beine','Maschine','hip'],
+  ['adduktoren','Adduktoren','Beine','Maschine','hip'],
+  ['wadenheben','Wadenheben','Beine','Maschine','calves'],
+  ['bauchmaschine','Bauchmaschine','Bauch','Maschine','abs'],
+  ['cablecrunch','Kabel-Crunches','Bauch','Kabelzug','abs'],
+  ['beinheben','Hängendes Beinheben','Bauch','Körpergewicht','pull'],
+  ['bizepscurls','Bizepscurls','Arme','Freihantel','curl'],
+  ['bizepsmaschine','Bizepsmaschine','Arme','Maschine','curl'],
+  ['hammercurls','Hammer-Curls','Arme','Freihantel','curl'],
+  ['trizepsdruecken','Trizepsdrücken','Arme','Kabelzug','cable'],
+  ['trizepsueberkopf','Trizeps über Kopf','Arme','Freihantel','overhead'],
+  ['dips','Dips','Arme','Körpergewicht','chest']
+].map(([id,name,group,equipment,art])=>({id,name,group,equipment,art}));
+const EXERCISE_TIPS = {
+ butterfly:'Sitzend die Griffe oder Polster kontrolliert vor der Brust zusammenführen.',
+ brustpresse:'Sitzend die Griffe auf Brusthöhe nach vorn drücken.',
+ schraegpresse:'Die Griffe aus leicht geneigter Sitzposition schräg nach vorn drücken.',
+ bankdruecken:'Auf einer Bank liegend die Langhantel über der Brust nach oben drücken.',
+ schraegbank:'Auf einer schrägen Bank die Kurzhanteln über der Brust nach oben drücken.',
+ kabelflys:'Zwischen Kabelzügen die Arme in einem Bogen vor der Brust zusammenführen.',
+ latzug:'Sitzend die breite Zugstange von oben kontrolliert zur oberen Brust ziehen.',
+ latzugeng:'Sitzend einen engen Griff von oben in Richtung Brust ziehen.',
+ rudern:'Sitzend den Griff des Zuggerätes zum Bauch ziehen.',
+ rudernlh:'Mit nach vorn geneigtem Oberkörper die Langhantel zum Bauch ziehen.',
+ klimmzuege:'An einer oberen Stange hängend den Körper mit den Armen hochziehen.',
+ rueckenstrecker:'An der Rückenstreckermaschine oder Hyperextension den Oberkörper aufrichten.',
+ reversebutterfly:'Sitzend die Arme an der Maschine nach außen und hinten öffnen.',
+ schulterpresse:'Die Griffe von Schulterhöhe aus über den Kopf nach oben drücken.',
+ seitheben:'Stehend die Kurzhanteln mit leicht gebeugten Armen seitlich anheben.',
+ facepulls:'Am hohen Kabelzug das Seil in Richtung Gesicht ziehen und die Ellbogen auseinanderführen.',
+ beinpresse:'Sitzend oder zurückgelehnt die Fußplatte mit beiden Beinen wegdrücken.',
+ beinstrecker:'Sitzend die Knie gegen das Polster strecken.',
+ beinbeuger:'An der Maschine die Knie gegen den Widerstand beugen.',
+ kniebeugen:'Mit kontrollierter Knie- und Hüftbeugung in die Hocke gehen und aufstehen.',
+ kreuzheben:'Eine Langhantel aus einer Hüftbeuge kontrolliert aufrichten.',
+ abduktoren:'Sitzend die Knie gegen den Widerstand nach außen bewegen.',
+ adduktoren:'Sitzend die Beine gegen den Widerstand nach innen zusammenführen.',
+ wadenheben:'Die Fersen kontrolliert heben und senken, während der Vorfuß gestützt ist.',
+ bauchmaschine:'An der Bauchmaschine den Oberkörper gegen Widerstand einrollen.',
+ cablecrunch:'Kniend am Kabelzug den Oberkörper nach unten einrollen.',
+ beinheben:'Hängend oder gestützt die Beine kontrolliert in Richtung Oberkörper heben.',
+ bizepscurls:'Mit Kurzhanteln die Ellenbogen beugen und das Gewicht anheben.',
+ bizepsmaschine:'An der Maschine die Ellenbogen gegen den Widerstand beugen.',
+ hammercurls:'Mit neutral gehaltenen Kurzhanteln die Ellenbogen beugen.',
+ trizepsdruecken:'Am hohen Kabelzug den Griff nach unten drücken, dabei die Ellenbogen nah am Körper halten.',
+ trizepsueberkopf:'Ein Gewicht von hinter dem Kopf nach oben strecken.',
+ dips:'Auf parallelen Griffen den Körper durch Beugen und Strecken der Arme bewegen.'
+};
+const BASE_PLANS = [
+  {id:'plan-ganz', name:'Ganzkörper', exerciseIds:['beinpresse','latzug','brustpresse','rudern','schulterpresse','bauchmaschine']},
+  {id:'plan-push', name:'Push · Brust & Trizeps', exerciseIds:['brustpresse','schraegpresse','butterfly','schulterpresse','seitheben','trizepsdruecken']},
+  {id:'plan-pull', name:'Pull · Rücken & Bizeps', exerciseIds:['latzug','rudern','reversebutterfly','facepulls','bizepscurls','rueckenstrecker']},
+  {id:'plan-beine', name:'Beine & Bauch', exerciseIds:['beinpresse','beinstrecker','beinbeuger','abduktoren','wadenheben','bauchmaschine']}
+];
+const $ = (q,root=document)=>root.querySelector(q);
+const el = id=>document.getElementById(id);
+const escapeHTML = x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid = ()=>crypto.randomUUID?crypto.randomUUID():'id-'+Date.now()+'-'+Math.random().toString(16).slice(2);
+const fmt = n=>new Intl.NumberFormat('de-DE',{maximumFractionDigits:1}).format(Number(n)||0);
+const shortDate = d=>new Intl.DateTimeFormat('de-DE',{day:'2-digit',month:'2-digit',year:'numeric'}).format(new Date(d+'T12:00:00'));
+const longDate = d=>new Intl.DateTimeFormat('de-DE',{weekday:'long',day:'numeric',month:'long',year:'numeric'}).format(new Date(d+'T12:00:00'));
+function localDate(dt=new Date()){return `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`;}
+function dateShift(date,n){let d=new Date(date+'T12:00:00');d.setDate(d.getDate()+n);return localDate(d);}
+const baseData=()=>({version:1,plans:BASE_PLANS.map(p=>({...p,exerciseIds:[...p.exerciseIds]})),customExercises:[],sessions:[]});
+let accounts=[],currentId=null,currentKey=null,data=null,activeTab='today',selectedDate=localDate();
+let libraryGroup='Alle',libraryQuery='',statExercise='latzug',statMetric='volume',modal=null,authMode='new',saveQueue=Promise.resolve(),toastTimer=null,appError='';
+let cloudStatus='Noch nicht verbunden',cloudConflict=false,cloudBusy=false,cloudDebounce=null,cloudNeedsRerun=false,localMutationSeq=0;
+const encoder=new TextEncoder(),decoder=new TextDecoder();
+
+function bytesToBase64(bytes){let s='';for(let i=0;i<bytes.length;i+=8192)s+=String.fromCharCode(...bytes.subarray(i,i+8192));return btoa(s);}
+function base64ToBytes(s){let raw=atob(s);return Uint8Array.from(raw,c=>c.charCodeAt(0));}
+async function deriveKey(password,salt){const key=await crypto.subtle.importKey('raw',encoder.encode(password),'PBKDF2',false,['deriveKey']);return crypto.subtle.deriveKey({name:'PBKDF2',salt,iterations:240000,hash:'SHA-256'},key,{name:'AES-GCM',length:256},false,['encrypt','decrypt']);}
+async function encryptText(plaintext,key){const iv=crypto.getRandomValues(new Uint8Array(12));const cipher=await crypto.subtle.encrypt({name:'AES-GCM',iv},key,encoder.encode(plaintext));return {iv:bytesToBase64(iv),cipher:bytesToBase64(new Uint8Array(cipher))};}
+async function decryptText(record,key){const buffer=await crypto.subtle.decrypt({name:'AES-GCM',iv:base64ToBytes(record.iv)},key,base64ToBytes(record.cipher));return decoder.decode(buffer);}
+function writeAccounts(){localStorage.setItem(STORE,JSON.stringify(accounts));}
+function toast(msg){let n=el('toast');n.textContent=msg;n.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>n.classList.remove('show'),2700);}
+function save(){
+ if(!data||!currentId||!currentKey)return;
+ localMutationSeq++;
+ const snapshot=JSON.stringify(data),id=currentId,key=currentKey;
+ // Bestehende Speicherschlüssel bleiben UNVERÄNDERT: App-Updates lassen die Daten intakt.
+ saveQueue=saveQueue.catch(()=>{}).then(async()=>{
+   const enc=await encryptText(snapshot,key);
+   const rec=accounts.find(a=>a.id===id);if(!rec)return;
+   rec.iv=enc.iv;rec.cipher=enc.cipher;rec.updatedAt=new Date().toISOString();
+   rec.localRevision=(rec.localRevision||0)+1;
+   writeAccounts();
+   if(currentId===id && rec.cloudUid) scheduleCloudSync();
+ }).catch(err=>{console.error('Speichern fehlgeschlagen',err);toast('Lokales Speichern fehlgeschlagen!');setCloudStatus('Fehler beim lokalen Speichern');});
+}
+async function flush(){await saveQueue;}
+function safeGetAccounts(){try{const a=JSON.parse(localStorage.getItem(STORE)||'[]');return Array.isArray(a)?a:[];}catch{return [];}}
+function allExercises(){return [...EXERCISES,...(data?.customExercises||[])];}
+function getEx(id){return allExercises().find(e=>e.id===id)||{id,name:'Unbekannte Übung',group:'Andere',equipment:'',art:'chest'};}
+function validSet(s){return s.reps!==''&&s.kg!==''&&s.reps!=null&&s.kg!=null&&Number.isFinite(Number(s.reps))&&Number.isFinite(Number(s.kg))&&Number(s.reps)>0&&Number(s.kg)>=0;}
+const exVolume = e=>e.sets.reduce((n,s)=>n+(validSet(s)?Number(s.kg)*Number(s.reps):0),0);
+const exPeak = e=>Math.max(0,...e.sets.filter(validSet).map(s=>Number(s.kg)));
+const exSetCount = e=>e.sets.filter(validSet).length;
+function session(){return data?.sessions.find(s=>s.date===selectedDate)||null;}
+function ensureSession(){let s=session();if(s)return s;s={id:uid(),date:selectedDate,createdAt:new Date().toISOString(),updatedAt:new Date().toISOString(),planId:null,planName:'Freies Training',exercises:[]};data.sessions.push(s);return s;}
+function addExerciseToSession(id){const s=ensureSession();if(s.exercises.some(e=>e.id===id))return false;s.exercises.push({id,sets:[{id:uid(),kg:'',reps:''},{id:uid(),kg:'',reps:''},{id:uid(),kg:'',reps:''}]});s.updatedAt=new Date().toISOString();save();return true;}
+function priorExercise(id){return data.sessions.filter(s=>s.date<selectedDate).sort((a,b)=>b.date.localeCompare(a.date)).map(s=>({date:s.date,ex:s.exercises.find(e=>e.id===id)})).find(x=>x.ex&&x.ex.sets.some(validSet))||null;}
+function exerciseEntries(id){return data.sessions.flatMap(s=>s.exercises.filter(e=>e.id===id&&e.sets.some(validSet)).map(ex=>({date:s.date,volume:exVolume(ex),peak:exPeak(ex),count:exSetCount(ex),ex})) ).sort((a,b)=>a.date.localeCompare(b.date));}
+const allEntries=()=>data.sessions.flatMap(s=>s.exercises.filter(e=>e.sets.some(validSet)).map(e=>({date:s.date,ex:e})));
+
+/* Die Übungsbilder sind eigenständig gezeichnete schematische SVG-Illustrationen. */
+function art(type){
+ const H='#cbed9a',M='#80a8b4',G='#4f7280';
+ const line=(path,c=H,w=5)=>`<path d="${path}" fill="none" stroke="${c}" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round"/>`;
+ const dot=(x,y,r=8)=>`<circle cx="${x}" cy="${y}" r="${r}" fill="${H}"/>`;
+ const bar=(x,y,w,h=4,c=M)=>`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="2" fill="${c}"/>`;
+ let z='';
+ switch(type){
+  case 'lat':z=bar(33,19,105,5)+line('M86 22V33',M,2)+line('M65 23L68 37L78 49 M108 23L103 37L90 49')+dot(84,46,9)+line('M84 55V78 M84 68L70 84 M84 68L99 84')+bar(61,83,47,5)+line('M121 20V102 M117 102H132',G,4)+bar(120,65,14,29,G);break;
+  case 'fly':z=dot(85,36)+line('M85 46V79 M85 52L51 46L36 65 M85 52L120 46L135 65 M85 79L70 92 M85 79L100 92')+line('M24 29V95 M146 29V95 M24 29H37 M133 29H146',G,4)+bar(69,93,35,5)+bar(27,59,12,13)+bar(131,59,12,13);break;
+  case 'chest':z=dot(70,33)+line('M70 43V79 M70 53L92 53L116 43 M70 57L92 68L120 69 M70 79L58 94 M70 79L84 94')+line('M47 29V100 M47 29H57 M49 76H76 M47 100H104',G,4)+bar(115,38,9,36)+bar(82,72,20,6,M);break;
+  case 'bench':z=dot(64,55)+line('M73 57L117 61 M86 60L74 76 M103 60L112 79 M87 57L86 36 M103 57L108 37')+bar(59,64,78,6,G)+line('M78 70L70 97 M118 70L126 97',M,4)+bar(74,27,43,5)+bar(67,23,8,12)+bar(118,23,8,12);break;
+  case 'row':z=dot(61,37)+line('M61 47L70 72L83 79 M64 51L91 52L110 50 M70 72L47 91 M83 79L107 95')+bar(45,75,30,6,G)+line('M40 76V98 M119 20V95',G,4)+bar(118,45,19,6)+line('M112 49L125 49',M,3);break;
+  case 'pull':z=bar(40,15,92,6)+dot(86,38)+line('M86 48V73 M86 50L56 27 M86 50L112 27 M86 73L71 93 M86 73L103 91')+line('M45 17V28 M126 17V28',M,3);break;
+  case 'overhead':z=dot(84,41)+line('M84 51V80 M84 56L64 45L57 22 M84 56L104 45L111 22 M84 80L70 97 M84 80L100 97')+bar(42,15,29,7)+bar(100,15,29,7)+bar(65,94,37,5,G);break;
+  case 'lateral':z=dot(84,38)+line('M84 48V79 M84 55L50 45L33 33 M84 55L118 45L136 33 M84 79L70 99 M84 79L97 99')+bar(18,27,23,8)+bar(127,27,23,8);break;
+  case 'legpress':z=dot(48,45)+line('M55 50L77 64L91 78 M58 49L83 55 M77 65L112 50L126 34 M91 78L124 68L138 49')+line('M26 36L43 56L72 76 M26 36L16 46 M29 84H92',G,5)+line('M137 17L154 36L140 50',M,7)+bar(126,25,20,5);break;
+  case 'legextension':z=dot(59,32)+line('M59 42V72 M59 72L89 77L124 67 M59 55L87 55 M59 72L39 92')+bar(43,72,48,6,G)+line('M44 78V98 M106 78V99',G,4)+bar(120,61,9,18);break;
+  case 'legcurl':z=dot(60,34)+line('M60 44V75 M60 75L94 80L102 99 M60 58L85 58 M60 75L44 93')+bar(39,73,43,7,G)+line('M45 81V101 M100 82V101',G,4)+bar(90,91,28,7);break;
+  case 'squat':z=dot(83,38)+line('M83 48L75 65L91 77 M79 52L58 47 M79 52L105 48 M75 65L59 81L64 99 M91 77L108 86L118 100')+bar(40,32,90,6)+bar(32,28,9,13)+bar(130,28,9,13);break;
+  case 'hinge':z=dot(105,42)+line('M101 52L70 67L81 84 M70 67L48 80 M70 67L93 81 M81 84L70 101 M81 84L106 98')+bar(38,86,92,6)+bar(27,81,12,17)+bar(129,81,12,17);break;
+  case 'hip':z=dot(85,34)+line('M85 44V74 M85 51L67 66 M85 51L103 66 M85 74L51 88L40 78 M85 74L116 88L130 78')+bar(65,72,41,8,G)+line('M69 77L61 100 M101 77L109 100',G,4)+bar(28,72,20,6)+bar(124,72,20,6);break;
+  case 'calves':z=dot(83,30)+line('M83 40V73 M83 44L67 62 M83 44L100 62 M83 73L72 94 M83 73L96 94')+bar(53,99,68,5,G)+bar(75,92,39,5)+line('M51 40V98 M120 40V98',G,4);break;
+  case 'abs':z=dot(77,35)+line('M77 45L92 65L100 79 M87 55L63 63 M92 65L72 80 M100 79L116 94')+bar(65,77,50,6,G)+line('M73 82L66 100 M107 82L117 100',G,4)+bar(52,53,20,5,M);break;
+  case 'curl':z=dot(84,33)+line('M84 43V79 M84 50L64 68L57 53 M84 50L104 68L111 53 M84 79L69 99 M84 79L100 99')+bar(41,46,27,7)+bar(101,46,27,7);break;
+  case 'cable':z=dot(89,34)+line('M89 44V77 M89 50L108 61L124 48 M89 50L70 62L55 54 M89 77L72 98 M89 77L107 98')+line('M27 19V103 M25 19H52 M25 39L53 55',M,4)+bar(20,70,13,24,G)+bar(117,41,11,14);break;
+  default:z=dot(83,35)+line('M83 45V79 M83 49L60 70 M83 49L105 70 M83 79L67 98 M83 79L101 98');
+ }
+ return `<svg viewBox="0 0 170 120" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Schematische Übungsillustration" focusable="false"><defs><linearGradient id="b${type}" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#29424a"/><stop offset="1" stop-color="#172a33"/></linearGradient></defs><rect width="170" height="120" rx="11" fill="url(#b${type})"/><circle cx="139" cy="21" r="57" fill="#bedb93" opacity=".045"/><path d="M13 104H157" stroke="#4e6b6e" stroke-width="1" stroke-dasharray="5 5"/>${z}</svg>`;
+}
+function artBox(ex,small=false){return `<div class="ex-art ${small?'mini':''}">${art(ex.art)}</div>`;}
+function svgIcon(name){const paths={home:'<path d="m3 10 9-7 9 7v10H3z"/><path d="M9 20v-7h6v7"/>',exercise:'<path d="M5 8v8M8 6v12M16 6v12M19 8v8M8 12h8"/>',plans:'<rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 9h8M8 13h8M8 17h5"/>',stats:'<path d="M4 20V4M4 20h17M7 16l4-5 3 2 6-8"/>',user:'<circle cx="12" cy="8" r="4"/><path d="M4 20c0-5 3-7 8-7s8 2 8 7"/>'};return `<svg viewBox="0 0 24 24" aria-hidden="true">${paths[name]||paths.home}</svg>`;}
+
+function render(){el('app').innerHTML=!currentId?renderAuth():renderShell();renderModal();}
+function isLinked(){const rec=accounts.find(a=>a.id===currentId);return !!(rec?.cloudUid && KraftlogCloud.loggedIn() && rec.cloudUid===KraftlogCloud.uid());}
+function setCloudStatus(message){cloudStatus=message;const target=el('cloud-status');if(target)target.textContent=message;}
+function cloudMessage(){
+ if(!KraftlogCloud.enabled())return 'Noch nicht eingerichtet – siehe README: Firebase-Einrichtung.';
+ if(cloudConflict)return 'Konflikt: Cloud und Gerät wurden unterschiedlich geändert. Bitte unten entscheiden.';
+ if(!isLinked())return 'Noch nicht mit einem Online-Konto verbunden.';
+ return cloudStatus;
+}
+function cloudForms(){
+ if(!KraftlogCloud.enabled())return `<div class="notice warning">Die Cloud ist noch nicht aktiviert. Trage zuerst die Firebase-Werte in <code>cloud-config.js</code> ein (Anleitung in README.md). Bis dahin bleiben deine bisherigen Daten unverändert auf diesem Handy.</div>`;
+ const rec=accounts.find(a=>a.id===currentId);
+ return `<div class="card stack"><div class="row"><div class="grow"><strong>Automatisch online speichern</strong><p class="intro" style="margin:4px 0 0">Jeder Nutzer bekommt ein eigenes kostenloses Online-Konto. Die Trainingsdaten werden vor dem Hochladen verschlüsselt.</p></div></div>
+ <p class="small muted" id="cloud-status" role="status">${escapeHTML(cloudMessage())}</p>
+ ${isLinked()?`<p class="intro">Verbunden als <strong>${escapeHTML(KraftlogCloud.email())}</strong>. Deine Änderungen werden bei Internetverbindung automatisch übertragen.</p><div class="btn-wrap"><button class="btn btn-primary grow" data-action="cloud-sync">Jetzt synchronisieren</button><button class="btn btn-ghost" data-action="cloud-logout">Online abmelden</button></div>`:
+ `<form id="cloud-link-form" class="stack"><div class="field"><label for="cloud-email">Deine E-Mail</label><input class="input" id="cloud-email" name="email" type="email" required autocomplete="email" placeholder="du@beispiel.de"></div><div class="field"><label for="cloud-password">Online-Passwort (mind. 8 Zeichen)</label><input class="input" id="cloud-password" name="password" type="password" minlength="8" required autocomplete="new-password"></div><div class="btn-wrap"><button class="btn btn-primary grow" type="submit" name="mode" value="register">Cloud-Konto erstellen</button><button class="btn grow" type="submit" name="mode" value="login">Mit Online-Konto verbinden</button></div><p class="small muted">Dein vorhandenes lokales Profil bleibt erhalten. Beim ersten Verbinden wird es in die Cloud übernommen, wenn dort noch keine Trainingsdaten liegen.</p></form>`}
+ ${cloudConflict?`<div class="notice warning"><strong>Änderungen auf zwei Geräten erkannt.</strong><p>Automatisches Überschreiben ist gestoppt. Entscheide, welche Version behalten werden soll.</p><div class="stack"><button class="btn btn-secondary btn-block" data-action="cloud-use-remote">Cloud-Version übernehmen (lokale Änderungen verwerfen)</button><button class="btn btn-red btn-block" data-action="cloud-use-local">Geräte-Version übernehmen (Cloud-Änderungen verwerfen)</button></div></div>`:''}
+ </div>`;
+}
+function renderAuth(){const newMode=authMode==='new'||!accounts.length;return `<main class="auth-layout"><div class="brand"><div class="mark">K</div><div><h1 style="font-size:19px;margin:0;letter-spacing:1px">KRAFTLOG</h1><small>DEIN TRAINING. DEINE DATEN.</small></div></div><h1>Stärker. Satz für Satz.</h1><p class="muted">Trainingspläne, Gewichte und Fortschritte – lokal verschlüsselt, auf Wunsch mit kostenloser Cloud-Synchronisierung.</p><section class="card auth-card"><h2>${newMode?'Dein privates Profil':'Profil entsperren'}</h2><p>${newMode?'Du legst ein verschlüsseltes Profil nur für dieses Gerät an.':'Deine Trainingsdaten sind auf diesem Gerät verschlüsselt gespeichert. Bei aktivierter Cloud werden sie zusätzlich online gesichert.'}</p><form id="auth-form" autocomplete="off">${newMode?`<div class="field"><label for="reg-name">Profilname</label><input required class="input" id="reg-name" name="name" maxlength="40" placeholder="z. B. Alex" autocomplete="nickname"></div>`:`<div class="field"><label for="login-profile">Profil auswählen</label><select class="input" id="login-profile" name="profile">${accounts.map(a=>`<option value="${escapeHTML(a.id)}">${escapeHTML(a.name)}</option>`).join('')}</select></div>`}<div class="field"><label for="auth-passwort">${newMode?'Passwort festlegen (mind. 8 Zeichen)':'Passwort'}</label><input required type="password" class="input" id="auth-passwort" name="password" minlength="8" autocomplete="${newMode?'new-password':'current-password'}" placeholder="Dein Passwort"></div>${newMode?`<div class="field"><label for="auth-confirm">Passwort wiederholen</label><input required type="password" class="input" id="auth-confirm" name="confirm" minlength="8" autocomplete="new-password" placeholder="Passwort wiederholen"></div>`:''}<button type="submit" class="btn btn-primary btn-block">${newMode?'Profil erstellen':'Profil öffnen'} →</button></form>${accounts.length?`<button type="button" class="btn btn-ghost btn-block" style="margin-top:10px" data-action="auth-mode">${newMode?'Vorhandenes Profil öffnen':'Neues Profil auf diesem Gerät erstellen'}</button>`:''}<button type="button" class="btn btn-ghost btn-block" style="margin-top:10px" data-action="import-backup">Verschlüsseltes Backup importieren</button><div class="auth-bubble">Dein Passwort verschlüsselt deine Trainingsdaten. Auch bei Cloud-Nutzung brauchst du es zum Entsperren. Ohne Cloud bleiben die Daten nur auf diesem Gerät.</div></section>${KraftlogCloud.enabled()?`<section class="card auth-card" style="margin-top:16px"><h2>Online-Profil wiederherstellen</h2><p>Neues Handy? Mit deinem Online-Konto den verschlüsselten Trainingsstand laden. Danach mit deinem bisherigen Profilpasswort entsperren.</p><form id="cloud-restore-form" class="stack"><div class="field"><label for="restore-email">E-Mail</label><input id="restore-email" name="email" class="input" type="email" required autocomplete="email"></div><div class="field"><label for="restore-password">Online-Passwort</label><input id="restore-password" name="password" class="input" type="password" minlength="8" required autocomplete="current-password"></div><button type="submit" class="btn btn-secondary btn-block">Online-Profil laden</button></form></section>`:''}<div class="auth-footer">Inoffizielles privates Trainingstagebuch · Kein Produkt von FitX</div></main>`;}
+function renderShell(){const count=data.sessions.filter(s=>s.exercises.some(e=>e.sets.some(validSet))).length;const tabs=[['today','Training','home'],['library','Übungen','exercise'],['plans','Pläne','plans'],['stats','Verlauf','stats'],['profile','Profil','user']];return `<main class="app-shell"><header class="header"><div class="brand"><div class="mark">K</div><div><h1>KRAFTLOG</h1><small>DEIN TRAINING. DEINE DATEN.</small></div></div><button class="profile-chip" data-action="switch-tab" data-tab="profile" aria-label="Profil öffnen"><span class="avatar">${escapeHTML((accounts.find(a=>a.id===currentId)?.name||'?').slice(0,1).toUpperCase())}</span><span class="truncate">${escapeHTML(accounts.find(a=>a.id===currentId)?.name)}</span></button></header>${activeTab==='today'?renderToday():activeTab==='library'?renderLibrary():activeTab==='plans'?renderPlans():activeTab==='stats'?renderStats():renderProfile()}<p class="footer-note">KRAFTLOG · privat & kostenlos · keine Verbindung zu FitX</p></main><nav class="bottomnav" aria-label="Hauptmenü">${tabs.map(([id,name,ico])=>`<button class="nav-button ${activeTab===id?'active':''}" data-action="switch-tab" data-tab="${id}" ${activeTab===id?'aria-current="page"':''}>${svgIcon(ico)}<span>${name}</span></button>`).join('')}</nav>`;}
+function renderDateBar(){return `<div class="card date-bar"><div class="date-label">${escapeHTML(longDate(selectedDate))}</div><button class="btn btn-small btn-icon" data-action="shift-date" data-days="-1" aria-label="Vorheriger Tag">‹</button><input class="input input-sm input-date" type="date" id="training-date" value="${selectedDate}" aria-label="Trainingstag wählen"><button class="btn btn-small btn-icon" data-action="shift-date" data-days="1" aria-label="Nächster Tag">›</button><button class="btn btn-small" data-action="today-date">Heute</button></div>`;}
+function renderToday(){const s=session();const entries=s?s.exercises:[],sets=entries.reduce((n,e)=>n+exSetCount(e),0),vol=entries.reduce((n,e)=>n+exVolume(e),0);return `<section class="hero"><span class="eyebrow">DEIN TRAININGSLOG</span><h2>Jeder Satz zählt.</h2><p>Wähle einen Tag, starte deinen Plan und halte deine Gewichte fest. Deinen Fortschritt siehst du im Verlauf.</p><div class="hero-footer"><span class="stat-pill"><strong>${entries.length}</strong> Übungen</span><span class="stat-pill"><strong id="day-set-count">${sets}</strong> erfasste Sätze</span><span class="stat-pill"><strong id="day-vol-total">${fmt(vol)} kg</strong> Volumen</span></div></section>${renderDateBar()}<div class="section-header"><h2>Dein Training</h2><span class="subtitle">${s?escapeHTML(s.planName)+(s.updatedAt?' · '+new Date(s.updatedAt).toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'}):''):'Noch nicht gestartet'}</span></div><div class="btn-wrap" style="margin-bottom:13px"><button class="btn btn-primary" data-action="open-plan-picker">▤ Trainingsplan auswählen</button><button class="btn" data-action="switch-tab" data-tab="library">＋ Übung hinzufügen</button></div>${entries.length?`<div class="stack">${entries.map(e=>renderSessionExercise(e)).join('')}</div>`:`<div class="empty"><span class="empty-icon">◎</span><strong>Noch keine Übungen für diesen Tag</strong><p>Wähle einen fertigen Plan oder füge einzelne Übungen hinzu. Du kannst alles jederzeit ändern.</p><button class="btn btn-secondary" data-action="open-plan-picker">Plan auswählen</button></div>`}${renderRecentDates()}`;}
+function renderRecentDates(){const dates=data.sessions.filter(s=>s.exercises.some(e=>e.sets.some(validSet))).sort((a,b)=>b.date.localeCompare(a.date)).slice(0,5);if(!dates.length)return '';return `<div class="section-header"><h3>Letzte Trainingstage</h3></div><div class="card stack">${dates.map(s=>`<button class="btn btn-ghost" style="justify-content:space-between" data-action="jump-date" data-date="${s.date}"><span>${shortDate(s.date)} · ${escapeHTML(s.planName||'Freies Training')}</span><span class="accent">${fmt(s.exercises.reduce((sum,e)=>sum+exVolume(e),0))} kg →</span></button>`).join('')}</div>`;}
+function renderSessionExercise(e){const ex=getEx(e.id),previous=priorExercise(e.id),volume=exVolume(e),n=exSetCount(e);return `<article class="card exercise-card"><div class="ex-head">${artBox(ex)}<div class="ex-info"><h3>${escapeHTML(ex.name)}</h3><p>${escapeHTML(ex.group)} · ${escapeHTML(ex.equipment)}</p><p class="ex-date">${previous?'Letztes Training: '+shortDate(previous.date):'Noch kein früherer Eintrag'}</p></div><button class="btn btn-icon btn-small btn-ghost" aria-label="Übung entfernen" title="Übung entfernen" data-action="remove-ex" data-ex="${ex.id}">×</button></div><div class="ex-detail">${previous?`<div class="ex-history"><strong>Zuletzt · ${shortDate(previous.date)}:</strong> ${previous.ex.sets.filter(validSet).map(s=>`${fmt(s.kg)} kg × ${fmt(s.reps)}`).join(' · ')}<br><span>Volumen: ${fmt(exVolume(previous.ex))} kg</span></div>`:''}<div class="sets-table">${e.sets.map((s,i)=>`<div class="set-row"><span class="set-num">${i+1}</span><div class="set-col"><label for="kg-${escapeHTML(s.id)}">GEWICHT (KG)</label><input id="kg-${escapeHTML(s.id)}" class="input input-sm" type="number" inputmode="decimal" min="0" max="9999" step="0.5" placeholder="kg" data-set-field="kg" data-ex="${ex.id}" data-set="${escapeHTML(s.id)}" value="${escapeHTML(s.kg)}" aria-label="Gewicht für Satz ${i+1}"></div><div class="set-col"><label for="reps-${escapeHTML(s.id)}">WIEDERHOLUNGEN</label><input id="reps-${escapeHTML(s.id)}" class="input input-sm" type="number" inputmode="numeric" min="1" max="9999" step="1" placeholder="Wdh." data-set-field="reps" data-ex="${ex.id}" data-set="${escapeHTML(s.id)}" value="${escapeHTML(s.reps)}" aria-label="Wiederholungen für Satz ${i+1}"></div><button class="btn btn-icon btn-small btn-ghost" style="margin-bottom:3px" data-action="remove-set" data-ex="${ex.id}" data-set="${escapeHTML(s.id)}" aria-label="Satz löschen" title="Satz löschen">×</button></div>`).join('')}</div><div class="ex-foot"><button class="btn btn-small" data-action="add-set" data-ex="${ex.id}">＋ Satz hinzufügen</button><span class="small muted">Volumen: <strong class="vol" id="volume-${ex.id}">${fmt(volume)} kg</strong> · <span id="setcount-${ex.id}">${n}</span> Sätze</span></div></div></article>`;}
+function renderFilters(active){return `<div class="filters">${GROUPS.map(g=>`<button class="chip ${g===active?'active':''}" data-action="filter-group" data-group="${g}">${g}</button>`).join('')}</div>`;}
+function renderLibrary(){const s=session(),selected=new Set(s?.exercises.map(e=>e.id)||[]),exs=allExercises().filter(ex=>(libraryGroup==='Alle'||ex.group===libraryGroup)&&(ex.name+' '+ex.equipment).toLowerCase().includes(libraryQuery.toLowerCase()));return `<div class="section-header"><div><h2>Übungen</h2><div class="intro">Tippe auf „Hinzufügen“, um die Übung für ${shortDate(selectedDate)} zu verwenden.</div></div></div><div class="library-tools"><input class="input" id="library-search" value="${escapeHTML(libraryQuery)}" placeholder="Übung suchen, z. B. Latzug …" autocomplete="off">${renderFilters(libraryGroup)}</div><div class="exercise-grid" id="library-results">${exs.map(ex=>`<article class="library-card"><button class="library-art" type="button" data-action="exercise-info" data-ex="${escapeHTML(ex.id)}" aria-label="Bild und Erklärung: ${escapeHTML(ex.name)}">${art(ex.art)}</button><div><h3>${escapeHTML(ex.name)}</h3><p>${escapeHTML(ex.group)} · ${escapeHTML(ex.equipment)}</p></div><button class="btn btn-small ${selected.has(ex.id)?'btn-secondary':'btn-primary'} btn-block" data-action="toggle-exercise" data-ex="${escapeHTML(ex.id)}">${selected.has(ex.id)?'✓ Ausgewählt':'＋ Hinzufügen'}</button></article>`).join('')}</div>${!exs.length?`<div class="empty">Keine passende Übung gefunden.</div>`:''}<div class="section-header"><h3>Eigene Übung fehlt?</h3></div><button class="btn btn-ghost btn-block" data-action="new-exercise">＋ Eigene Übung anlegen</button><div class="notice">Die Bilder sind vereinfachte Zeichnungen zur Orientierung, keine offiziellen Gerätebilder von FitX. Prüfe am Gerät die tatsächliche Ausführung.</div>`;}
+function renderPlans(){return `<div class="section-header"><div><h2>Deine Trainingspläne</h2><p class="intro">Erstelle Pläne oder passe die Vorschläge an. Vor jedem Training kannst du Übungen an- und abwählen.</p></div></div><div class="stack">${data.plans.map(p=>`<article class="card plan-card"><div class="plan-art"></div><h3>${escapeHTML(p.name)}</h3><p>${p.exerciseIds.length} Übungen</p><div class="chiplist">${p.exerciseIds.slice(0,7).map(id=>`<span>${escapeHTML(getEx(id).name)}</span>`).join('')}${p.exerciseIds.length>7?`<span>+${p.exerciseIds.length-7}</span>`:''}</div><div class="btn-wrap"><button class="btn btn-primary btn-small" data-action="start-plan" data-plan="${p.id}">Für ${shortDate(selectedDate)} verwenden</button><button class="btn btn-small" data-action="edit-plan" data-plan="${p.id}">Bearbeiten</button></div></article>`).join('')}</div><button class="btn btn-secondary btn-block" style="margin-top:12px" data-action="edit-plan" data-plan="">＋ Eigenen Trainingsplan erstellen</button>`;}
+function plotChart(entries,metric){if(!entries.length)return `<div class="empty"><strong>Noch keine Daten</strong><p>Trage Sätze mit Gewicht und Wiederholungen ein, dann erscheint hier dein Fortschritt.</p></div>`;const pts=entries.slice(-14);const W=700,H=244,p={l:52,r:17,t:23,b:44};const vals=pts.map(x=>metric==='volume'?x.volume:x.peak);const max=Math.max(1,...vals);const yMax=Math.ceil(max/Math.pow(10,Math.floor(Math.log10(max)))*1.13)*Math.pow(10,Math.floor(Math.log10(max)));const xAt=i=>p.l+(pts.length===1?(W-p.l-p.r)/2:i*(W-p.l-p.r)/(pts.length-1));const yAt=v=>H-p.b-(v/yMax)*(H-p.t-p.b);const xy=pts.map((x,i)=>[xAt(i),yAt(vals[i])]);const grid=[0,.25,.5,.75,1].map(f=>`<line x1="${p.l}" y1="${yAt(yMax*f)}" x2="${W-p.r}" y2="${yAt(yMax*f)}" stroke="#32414a" stroke-dasharray="4 6"/><text x="${p.l-9}" y="${yAt(yMax*f)+4}" fill="#91a9b2" text-anchor="end" font-size="12">${fmt(yMax*f)}</text>`).join('');const path=xy.map((a,i)=>`${i?'L':'M'}${a[0].toFixed(1)} ${a[1].toFixed(1)}`).join(' ');const area=path+` L${xy.at(-1)[0]} ${H-p.b} L${xy[0][0]} ${H-p.b} Z`;const indices=[0,Math.floor((pts.length-1)/2),pts.length-1].filter((v,i,a)=>a.indexOf(v)===i);return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Verlaufsdiagramm für ${metric==='volume'?'Trainingsvolumen':'maximales Gewicht'}"><defs><linearGradient id="areafill" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#d3f971" stop-opacity=".24"/><stop offset="1" stop-color="#d3f971" stop-opacity="0"/></linearGradient></defs>${grid}<path d="${area}" fill="url(#areafill)"/><path d="${path}" fill="none" stroke="#d3f971" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>${xy.map((a,i)=>`<circle cx="${a[0]}" cy="${a[1]}" r="5" fill="#d3f971" stroke="#14231c" stroke-width="2"/><title>${shortDate(pts[i].date)}: ${fmt(vals[i])} kg</title>`).join('')}${indices.map(i=>`<text x="${xAt(i)}" y="${H-15}" fill="#9babb3" font-size="12" text-anchor="middle">${shortDate(pts[i].date).slice(0,5)}</text>`).join('')}</svg>`;}
+function renderStats(){const usedIds=new Set(allEntries().map(x=>x.ex.id));const exercises=allExercises().filter(e=>usedIds.has(e.id));if(exercises.length&&!usedIds.has(statExercise))statExercise=exercises[0].id;const entries=exerciseEntries(statExercise),totalSessions=data.sessions.filter(s=>s.exercises.some(e=>e.sets.some(validSet))).length,completed=allEntries(),totalSets=completed.reduce((n,x)=>n+exSetCount(x.ex),0),totalVolume=completed.reduce((n,x)=>n+exVolume(x.ex),0),last=entries.at(-1);return `<div class="section-header"><div><h2>Dein Fortschritt</h2><p class="intro">Nur tatsächlich eingetragene Sätze werden ausgewertet.</p></div></div><div class="stats-grid"><div class="metric-card"><strong>${totalSessions}</strong><small>Trainingstage</small></div><div class="metric-card"><strong>${totalSets}</strong><small>Erfasste Sätze</small></div><div class="metric-card"><strong>${fmt(totalVolume)}</strong><small>Gesamtvolumen (kg)</small></div><div class="metric-card"><strong>${exercises.length}</strong><small>Trainierte Übungen</small></div></div>${exercises.length?`<div class="card"><div class="field"><label for="stat-exercise">Übung auswählen</label><select class="input" id="stat-exercise">${exercises.map(e=>`<option value="${e.id}" ${statExercise===e.id?'selected':''}>${escapeHTML(e.name)}</option>`).join('')}</select></div><div class="section-header"><h3>${escapeHTML(getEx(statExercise).name)}</h3><span class="subtitle">${entries.length} Einträge</span></div><div class="chart-switch"><button class="chip ${statMetric==='volume'?'active':''}" data-action="metric" data-metric="volume">Trainingsvolumen</button><button class="chip ${statMetric==='peak'?'active':''}" data-action="metric" data-metric="peak">Max. Gewicht</button></div><div class="chart-wrap">${plotChart(entries,statMetric)}</div>${last?`<p class="small muted">Zuletzt: ${shortDate(last.date)} · ${fmt(last.peak)} kg max. · ${fmt(last.volume)} kg Volumen · ${last.count} Sätze</p>`:''}<div class="section-header"><h3>Trainingsverlauf</h3></div><div style="overflow:auto"><table class="stat-table"><thead><tr><th>Datum</th><th>Sätze</th><th>Max. kg</th><th>Volumen</th></tr></thead><tbody>${entries.slice().reverse().map(x=>`<tr><td>${shortDate(x.date)}</td><td>${x.count}</td><td>${fmt(x.peak)}</td><td>${fmt(x.volume)} kg</td></tr>`).join('')}</tbody></table></div></div>`:`<div class="empty"><span class="empty-icon">↗</span><strong>Deine Statistik wartet</strong><p>Öffne „Training“, füge eine Übung hinzu und trage Gewicht und Wiederholungen ein.</p><button class="btn btn-primary" data-action="switch-tab" data-tab="today">Training starten</button></div>`}<div class="notice">Volumen = Summe aus Gewicht × Wiederholungen aller erfassten Sätze einer Übung. Die Gerätegewichte sind zwischen verschiedenen Maschinen nicht direkt vergleichbar. Bei Kurzhanteln für die Volumenberechnung das Gesamtgewicht beider Hanteln eingeben.</div>`;}
+function renderProfile(){
+ const rec=accounts.find(a=>a.id===currentId);
+ return `<div class="section-header"><div><h2>Dein Profil</h2><p class="intro">${escapeHTML(rec?.name)} · verschlüsselt auf diesem Gerät${rec?.cloudUid?' und online':''}</p></div></div>
+ <div class="card"><div class="row"><div class="avatar" style="height:47px;width:47px;font-size:20px">${escapeHTML((rec?.name||'?').slice(0,1).toUpperCase())}</div><div class="grow"><strong>${escapeHTML(rec?.name)}</strong><div class="small muted">Verschlüsseltes Profil mit eigenem Passwort</div></div></div><button class="btn btn-ghost btn-block" data-action="lock" style="margin-top:17px">Profil sperren</button></div>
+ <div class="section-header"><h3>Cloud-Synchronisierung</h3></div>${cloudForms()}
+ <div class="section-header"><h3>Zusätzliche Sicherung</h3></div><div class="card stack"><p class="intro" style="margin:0">Bei aktivierter Cloud musst du für den normalen Gerätewechsel kein Backup von Hand übertragen. Einen gelegentlichen Export empfehlen wir trotzdem: Auch ein Online-Dienst kann ausfallen oder Daten können versehentlich gelöscht werden.</p><button class="btn btn-primary btn-block" data-action="export-backup">↓ Verschlüsseltes Backup herunterladen (optional)</button><button class="btn btn-ghost btn-block" data-action="import-backup">↑ Backup als zusätzliches Profil importieren</button><div class="notice warning">Ohne aktive Cloud oder bei dauerhaft fehlgeschlagener Synchronisierung liegen neue Einträge nur auf diesem Gerät. Bei Verlust des Profilpassworts lassen sich auch online gespeicherte Trainingsdaten nicht entschlüsseln.</div></div>
+ <div class="section-header"><h3>Datenschutz und Updates</h3></div><div class="card"><p class="intro">KRAFTLOG verschlüsselt Trainingsdaten mit AES-GCM. Im öffentlichen GitHub-Repository steht nur der App-Code; die Cloud-Daten gehören zu deinem angemeldeten Online-Konto und sind durch Firebase-Sicherheitsregeln geschützt.</p><p class="intro">Die bisherigen lokalen Daten werden beim Update nicht gelöscht. Wichtig ist, dieselbe GitHub-Pages-Webadresse zu behalten. Der Online-Stand kann auf neuen Geräten wiederhergestellt werden.</p></div>
+ <div class="section-header"><h3>Profil von diesem Gerät entfernen</h3></div><button class="btn btn-red btn-block" data-action="delete-profile">Lokales Profil löschen (Cloud bleibt erhalten)</button>`;
+}
+
+function modalMarkup(title,body,foot=''){return `<div class="overlay" id="overlay" role="presentation"><section class="sheet" role="dialog" aria-modal="true" aria-label="${escapeHTML(title)}"><div class="sheet-head"><h3>${escapeHTML(title)}</h3><button class="btn btn-icon btn-small btn-ghost" data-action="close-modal" aria-label="Schließen">×</button></div><div class="sheet-body">${body}</div>${foot?`<div class="sheet-foot">${foot}</div>`:''}</section></div>`;}
+function checklist(ids){const selected=new Set(ids);return `<div class="select-exercises">${allExercises().map(ex=>`<label class="select-ex"><input type="checkbox" data-select-ex="${ex.id}" ${selected.has(ex.id)?'checked':''}>${artBox(ex)}<span class="grow"><strong>${escapeHTML(ex.name)}</strong><small>${escapeHTML(ex.group)} · ${escapeHTML(ex.equipment)}</small></span></label>`).join('')}</div>`;}
+function renderModal(){const root=el('modal-root');if(!modal){root.innerHTML='';return;}if(modal.type==='choosePlan'){const p=data.plans.find(p=>p.id===modal.planId)||data.plans[0];root.innerHTML=modalMarkup('Trainingsplan wählen',`<div class="field"><label for="choose-plan">Plan</label><select id="choose-plan" class="input">${data.plans.map(p=>`<option value="${p.id}" ${p.id===modal.planId?'selected':''}>${escapeHTML(p.name)}</option>`).join('')}</select></div><p class="modal-help">Wähle vor dem Start Übungen an oder ab. Bereits eingetragene Übungen an diesem Tag werden nicht gelöscht.</p>${checklist(modal.ids)}`,`<button class="btn btn-primary btn-block" data-action="apply-plan" ${modal.ids.length?'':'disabled'}>Mit ${modal.ids.length} Übungen übernehmen</button>`);}else if(modal.type==='editPlan'){const p=modal.draft;root.innerHTML=modalMarkup(modal.isNew?'Trainingsplan erstellen':'Trainingsplan bearbeiten',`<div class="field"><label for="plan-name">Name des Plans</label><input class="input" id="plan-name" maxlength="50" value="${escapeHTML(p.name)}" placeholder="z. B. Oberkörper A"></div><p class="modal-help">Lege fest, welche Übungen standardmäßig in deinem Plan enthalten sind. Vor jedem Training kannst du die Auswahl ändern.</p>${checklist(p.exerciseIds)}`,`<div class="btn-wrap"><button class="btn btn-primary grow" data-action="save-plan">Plan speichern</button>${!modal.isNew?`<button class="btn btn-red" data-action="delete-plan">Löschen</button>`:''}</div>`);}else if(modal.type==='infoExercise'){const ex=getEx(modal.exId);root.innerHTML=modalMarkup(ex.name,`<div style="max-width:410px;margin:0 auto 15px;height:220px" class="library-art">${art(ex.art)}</div><div class="row" style="margin-bottom:10px"><span class="tag">${escapeHTML(ex.group)}</span><span class="tag">${escapeHTML(ex.equipment)}</span></div><p class="intro">${escapeHTML(EXERCISE_TIPS[ex.id]||'Individuell angelegte Übung. Achte auf die Gerätebeschriftung im Studio und eine kontrollierte Ausführung.')}</p><p class="modal-help">Die Zeichnung dient nur zur Orientierung und ersetzt keine Übungsanleitung durch eine Fachperson.</p>`,`<button class="btn btn-primary btn-block" data-action="info-add" data-ex="${escapeHTML(ex.id)}">＋ Für ${shortDate(selectedDate)} hinzufügen</button>`);}else if(modal.type==='customExercise'){root.innerHTML=modalMarkup('Eigene Übung erstellen',`<div class="stack"><div class="field"><label for="custom-name">Übungsname</label><input class="input" id="custom-name" maxlength="60" placeholder="z. B. Hackenschmidt-Presse"></div><div class="field"><label for="custom-group">Muskelgruppe</label><select class="input" id="custom-group">${GROUPS.slice(1).map(g=>`<option>${g}</option>`).join('')}</select></div><div class="field"><label for="custom-kind">Art</label><select class="input" id="custom-kind"><option>Maschine</option><option>Freihantel</option><option>Kabelzug</option><option>Körpergewicht</option></select></div><div class="notice">Für eigene Übungen wird eine passende schematische Standardillustration angezeigt.</div></div>`,`<button class="btn btn-primary btn-block" data-action="save-custom">Übung erstellen & hinzufügen</button>`);}}
+function refreshModalKeepScroll(){const old=$('.sheet-body')?.scrollTop||0;renderModal();if($('.sheet-body'))$('.sheet-body').scrollTop=old;}
+function setDay(date){if(!/^\d{4}-\d{2}-\d{2}$/.test(date)||Number.isNaN(new Date(date+'T12:00:00').getTime()))return;selectedDate=date;activeTab='today';render();}
+function switchTab(tab){activeTab=tab;render();window.scrollTo({top:0,behavior:'instant'});}
+function syncVolume(){const s=session();if(!s)return;const tot=s.exercises.reduce((sum,x)=>sum+exVolume(x),0),sets=s.exercises.reduce((sum,x)=>sum+exSetCount(x),0);if(el('day-set-count'))el('day-set-count').textContent=sets;if(el('day-vol-total'))el('day-vol-total').textContent=fmt(tot)+' kg';}
+
+/* Synchronisierung: verschlüsselter Upload mit Firestore-Versionsprüfung.
+   Bei Konflikten werden Daten NIEMALS automatisch überschrieben. */
+function cloudSafeProfile(rec){
+ const {id,name,salt,iv,cipher,createdAt,updatedAt}=rec;
+ return {id,name,salt,iv,cipher,createdAt,updatedAt};
+}
+function validCloudProfile(p){
+ if(!p||typeof p.id!=='string'||typeof p.name!=='string'||p.name.length>70)return false;
+ try {return ['salt','iv','cipher'].every(k=>typeof p[k]==='string'&&p[k].length>8)&&base64ToBytes(p.salt).length===16&&base64ToBytes(p.iv).length===12;}catch{return false;}
+}
+function scheduleCloudSync(){
+ if(!isLinked()||cloudConflict)return;
+ clearTimeout(cloudDebounce);
+ cloudDebounce=setTimeout(()=>{syncCloud().catch(e=>console.warn('Cloud-Sync:',e));},1700);
+}
+async function applyCloudProfile(remote, rec, expectedMutation=localMutationSeq){
+ const profile=remote.profile;
+ if(!validCloudProfile(profile)||profile.id!==rec.id||profile.salt!==rec.salt)throw new Error('Das Cloud-Profil passt nicht zu diesem Gerät. Bitte Support/Backup prüfen.');
+ const parsed=JSON.parse(await decryptText(profile,currentKey));
+ if(!Array.isArray(parsed.sessions)||!Array.isArray(parsed.plans)||!Array.isArray(parsed.customExercises))throw new Error('Cloud-Profil beschädigt.');
+ if(localMutationSeq!==expectedMutation){cloudConflict=true;throw new Error('Während des Ladens wurde lokal trainiert. Kein Stand wurde überschrieben. Bitte Konflikt im Profil lösen.');}
+ data=parsed;
+ rec.iv=profile.iv;rec.cipher=profile.cipher;
+ rec.updatedAt=profile.updatedAt;
+ rec.cloudVersion=remote.updateTime;
+ rec.cloudSyncedLocalRev=rec.localRevision||0;
+ writeAccounts();
+ render();
+}
+async function syncCloud({forceLocal=false,forceRemote=false}={}){
+ if(cloudBusy){cloudNeedsRerun=true;return;}
+ if(!isLinked()||!navigator.onLine)return;
+ if(cloudConflict&&!forceLocal&&!forceRemote)return;
+ cloudBusy=true;
+ try{
+   await flush();
+   if(!isLinked())return;
+   const rec=accounts.find(a=>a.id===currentId);
+   const remote=await KraftlogCloud.getProfile();
+   await flush(); // Auch Änderungen berücksichtigen, die während des Netzaufrufs erfolgten.
+   const expectedMutation=localMutationSeq;
+   const dirty=(rec.localRevision||0)>(rec.cloudSyncedLocalRev||0);
+   const differs=!!remote && remote.updateTime!==rec.cloudVersion;
+   if(forceRemote){
+     if(!remote)throw new Error('In der Cloud sind keine Daten vorhanden.');
+     await applyCloudProfile(remote,rec,expectedMutation);cloudConflict=false;setCloudStatus('Cloud-Daten übernommen und lokal gespeichert');return;
+   }
+   if(differs&&!forceLocal){
+     if(dirty){cloudConflict=true;setCloudStatus('Konflikt: Cloud und Gerät haben unterschiedliche Änderungen');if(activeTab==='profile')render();return;}
+     await applyCloudProfile(remote,rec,expectedMutation);setCloudStatus('Aktuellen Cloud-Stand geladen');return;
+   }
+   if(!dirty&&!forceLocal&&remote){setCloudStatus('Alles synchronisiert');return;}
+   setCloudStatus('Synchronisiere …');
+   // Snapshot inklusive lokaler Revision wird VOR dem Netzaufruf festgehalten.
+   const snapshot=cloudSafeProfile(rec),rev=rec.localRevision||0;
+   const stamp=await KraftlogCloud.putProfile(snapshot,remote?.updateTime||null);
+   rec.cloudVersion=stamp;
+   rec.cloudSyncedLocalRev=rev;
+   cloudConflict=false;writeAccounts();
+   setCloudStatus('Synchronisiert · '+new Date().toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'}));
+   if((rec.localRevision||0)>rev)scheduleCloudSync();
+ }catch(err){
+   if(err.conflict){cloudConflict=true;setCloudStatus('Konflikt erkannt: Bitte im Profil entscheiden');if(activeTab==='profile')render();}
+   else {setCloudStatus((cloudConflict?'Konflikt – ':'Cloud nicht erreichbar: lokal gespeichert · ')+err.message);console.warn(err);if(cloudConflict&&activeTab==='profile')render();}
+ }finally{
+   cloudBusy=false;
+   if(cloudNeedsRerun){cloudNeedsRerun=false;if(!cloudConflict)scheduleCloudSync();}
+ }
+}
+async function linkCloud(form,mode='login'){
+ await flush();
+ const fd=new FormData(form),email=String(fd.get('email')||''),pw=String(fd.get('password')||'');
+ if(pw.length<8)throw new Error('Online-Passwort: mindestens 8 Zeichen.');
+ const rec=accounts.find(a=>a.id===currentId);
+ if(!rec)throw new Error('Bitte zuerst das Profil entsperren.');
+ await KraftlogCloud.authenticate(email,pw,mode==='register',rec.id);
+ const remote=await KraftlogCloud.getProfile();
+ if(remote && (!rec.cloudUid||rec.cloudUid!==KraftlogCloud.uid()))throw new Error('Dieses Online-Konto enthält bereits ein Profil. Die vorhandenen Cloud-Daten wurden nicht überschrieben. Bitte über „Online-Profil laden“ am Anmeldebildschirm wiederherstellen.');
+ if(rec.cloudUid && rec.cloudUid!==KraftlogCloud.uid())throw new Error('Dieses Profil ist bereits mit einem anderen Online-Konto verknüpft.');
+ rec.cloudUid=KraftlogCloud.uid();
+ rec.cloudVersion=rec.cloudVersion||null;
+ rec.localRevision=rec.localRevision||0;
+ rec.cloudSyncedLocalRev=rec.cloudSyncedLocalRev||0;
+ writeAccounts();cloudConflict=false;
+ setCloudStatus('Verbunden – erste Synchronisierung …');render();
+ await syncCloud();
+}
+async function restoreCloud(form){
+ const fd=new FormData(form),email=String(fd.get('email')||''),pw=String(fd.get('password')||'');
+ await KraftlogCloud.authenticate(email,pw,false,null);
+ const remote=await KraftlogCloud.getProfile();
+ if(!remote)throw new Error('Dieses Online-Konto hat noch keine gesicherten Trainingsdaten.');
+ const incoming=remote.profile;
+ if(!validCloudProfile(incoming))throw new Error('Online-Profil hat ein ungültiges Format.');
+ const existing=accounts.find(a=>a.id===incoming.id);
+ if(existing && (existing.localRevision||0)>(existing.cloudSyncedLocalRev||0))throw new Error('Dieses Gerät enthält noch nicht synchronisierte Einträge. Öffne zunächst das lokale Profil und synchronisiere es.');
+ if(existing){
+   if(!confirm('Lokales Profil durch den gesicherten Cloud-Stand ersetzen?'))return;
+   Object.assign(existing,incoming,{cloudUid:KraftlogCloud.uid(),cloudVersion:remote.updateTime,cloudSyncedLocalRev:existing.localRevision||0});
+ } else accounts.push({...incoming,cloudUid:KraftlogCloud.uid(),cloudVersion:remote.updateTime,localRevision:0,cloudSyncedLocalRev:0});
+ KraftlogCloud.associate(incoming.id);
+ writeAccounts();authMode='login';render();
+ toast('Online-Profil geladen. Mit deinem bisherigen Profilpasswort öffnen.');
+}
+async function createProfile(name,password){const salt=crypto.getRandomValues(new Uint8Array(16)),key=await deriveKey(password,salt),id=uid(),encrypted=await encryptText(JSON.stringify(baseData()),key);accounts.push({id,name,salt:bytesToBase64(salt),...encrypted,createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()});writeAccounts();currentId=id;currentKey=key;data=baseData();activeTab='today';render();toast('Profil erstellt und verschlüsselt gespeichert');}
+async function openProfile(id,password){const rec=accounts.find(a=>a.id===id);if(!rec)throw new Error('Profil nicht gefunden');const key=await deriveKey(password,base64ToBytes(rec.salt));const text=await decryptText(rec,key);const parsed=JSON.parse(text);if(!Array.isArray(parsed.sessions)||!Array.isArray(parsed.plans)||!Array.isArray(parsed.customExercises))throw new Error('Profil beschädigt');currentId=id;currentKey=key;data=parsed;activeTab='today';selectedDate=localDate();render();toast('Profil entsperrt');if(isLinked())syncCloud().catch(console.warn);}
+async function lockProfile(){await flush();currentId=null;currentKey=null;data=null;modal=null;authMode='login';render();}
+function exportBackup(){const rec=accounts.find(a=>a.id===currentId);if(!rec)return;flush().then(()=>{const contents={format:'kraftlog-encrypted-backup-v1',exportedAt:new Date().toISOString(),profile:{...rec}};const url=URL.createObjectURL(new Blob([JSON.stringify(contents,null,2)],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download=`KRAFTLOG-Backup-${rec.name.replace(/[^a-z0-9äöüß_-]/gi,'_')}-${localDate()}.json`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),10000);toast('Verschlüsseltes Backup erstellt');});}
+async function importBackup(file){if(!file)return;if(file.size>10*1024*1024){toast('Backup ist zu groß (max. 10 MB)');return;}try{const incoming=JSON.parse(await file.text());const r=incoming.profile;if(incoming.format!=='kraftlog-encrypted-backup-v1'||!r||typeof r.name!=='string'||r.name.length>70||!['salt','iv','cipher'].every(k=>typeof r[k]==='string'&&r[k].length>8))throw new Error('Ungültiges Backup');if(base64ToBytes(r.salt).length!==16||base64ToBytes(r.iv).length!==12)throw new Error('Ungültige Verschlüsselungsdaten');accounts.push({...r,id:uid(),name:r.name+' (Import)',updatedAt:new Date().toISOString()});writeAccounts();authMode='login';toast('Backup importiert. Mit ursprünglichem Passwort öffnen.');if(!currentId)render();}catch(err){console.warn(err);toast('Backup konnte nicht importiert werden');}}
+
+async function handleClick(event){const btn=event.target.closest('[data-action]');if(!btn)return;const action=btn.dataset.action;try{
+ switch(action){
+  case 'switch-tab':switchTab(btn.dataset.tab);break;
+  case 'today-date':setDay(localDate());break;
+  case 'shift-date':setDay(dateShift(selectedDate,Number(btn.dataset.days)));break;
+  case 'jump-date':setDay(btn.dataset.date);break;
+  case 'auth-mode':authMode=authMode==='new'?'login':'new';render();break;
+  case 'lock':await lockProfile();break;
+  case 'filter-group':libraryGroup=btn.dataset.group;render();break;
+  case 'toggle-exercise':{const id=btn.dataset.ex,s=session();if(s?.exercises.some(e=>e.id===id)){const ent=s.exercises.find(e=>e.id===id);if(ent.sets.some(validSet)&&!confirm('Die eingetragenen Sätze dieser Übung für diesen Tag wirklich löschen?'))break;s.exercises=s.exercises.filter(e=>e.id!==id);save();toast('Übung entfernt');}else{addExerciseToSession(id);toast('Übung hinzugefügt');}render();break;}
+  case 'remove-ex':{const s=session(),ent=s?.exercises.find(e=>e.id===btn.dataset.ex);if(!ent)break;if(ent.sets.some(validSet)&&!confirm('Diese Übung und ihre Sätze für diesen Tag löschen?'))break;s.exercises=s.exercises.filter(e=>e!==ent);save();render();toast('Übung entfernt');break;}
+  case 'add-set':{const ex=session()?.exercises.find(e=>e.id===btn.dataset.ex);if(!ex)break;ex.sets.push({id:uid(),kg:'',reps:''});save();render();break;}
+  case 'remove-set':{const ex=session()?.exercises.find(e=>e.id===btn.dataset.ex);if(!ex)break;const set=ex.sets.find(s=>s.id===btn.dataset.set);if(set&&validSet(set)&&!confirm('Erfassten Satz wirklich löschen?'))break;ex.sets=ex.sets.filter(s=>s!==set);if(!ex.sets.length)ex.sets.push({id:uid(),kg:'',reps:''});save();render();break;}
+  case 'open-plan-picker':{const p=data.plans[0];modal={type:'choosePlan',planId:p?.id,ids:[...(p?.exerciseIds||[])]};renderModal();break;}
+  case 'start-plan':{const p=data.plans.find(x=>x.id===btn.dataset.plan);modal={type:'choosePlan',planId:p.id,ids:[...p.exerciseIds]};renderModal();break;}
+  case 'apply-plan':{const p=data.plans.find(x=>x.id===modal.planId);if(!p||!modal.ids.length){toast('Mindestens eine Übung auswählen');break;}const s=ensureSession();s.planId=p.id;s.planName=p.name;let added=0;modal.ids.forEach(id=>{if(!s.exercises.some(ex=>ex.id===id)){s.exercises.push({id,sets:[{id:uid(),kg:'',reps:''},{id:uid(),kg:'',reps:''},{id:uid(),kg:'',reps:''}]});added++;}});save();modal=null;activeTab='today';render();toast(`${added} Übungen übernommen`);break;}
+  case 'edit-plan':{const p=data.plans.find(x=>x.id===btn.dataset.plan);modal={type:'editPlan',isNew:!p,draft:p?{id:p.id,name:p.name,exerciseIds:[...p.exerciseIds]}:{id:uid(),name:'',exerciseIds:[]}};renderModal();break;}
+  case 'save-plan':{const p=modal?.draft;if(!p)break;p.name=p.name.trim();if(!p.name){toast('Bitte Plannamen eingeben');$('#plan-name')?.focus();break;}if(!p.exerciseIds.length){toast('Mindestens eine Übung auswählen');break;}if(modal.isNew)data.plans.push(p);else{const idx=data.plans.findIndex(x=>x.id===p.id);if(idx<0)break;data.plans[idx]=p;}save();modal=null;render();toast('Trainingsplan gespeichert');break;}
+  case 'delete-plan':{if(data.plans.length<=1){toast('Mindestens ein Plan muss bleiben');break;}if(!confirm('Diesen Trainingsplan löschen? Bereits erfasste Trainings bleiben erhalten.'))break;data.plans=data.plans.filter(p=>p.id!==modal.draft.id);save();modal=null;render();toast('Plan gelöscht');break;}
+  case 'new-exercise':modal={type:'customExercise'};renderModal();break;
+  case 'exercise-info':modal={type:'infoExercise',exId:btn.dataset.ex};renderModal();break;
+  case 'info-add':{const added=addExerciseToSession(btn.dataset.ex);modal=null;activeTab='today';render();toast(added?'Übung hinzugefügt':'Übung ist bereits im Training');break;}
+  case 'save-custom':{const name=$('#custom-name')?.value.trim(),group=$('#custom-group')?.value,equipment=$('#custom-kind')?.value;if(!name){toast('Bitte einen Übungsnamen eingeben');break;}const artType=({Brust:'chest',Rücken:'row',Schultern:'overhead',Beine:'legpress',Bauch:'abs',Arme:'curl'})[group]||'chest';const ex={id:'custom-'+uid(),name:name.slice(0,60),group,equipment,art:artType};data.customExercises.push(ex);addExerciseToSession(ex.id);save();modal=null;activeTab='library';render();toast('Eigene Übung hinzugefügt');break;}
+  case 'metric':statMetric=btn.dataset.metric;render();break;
+  case 'close-modal':modal=null;renderModal();break;
+  case 'import-backup':{let input=el('backup-file');if(!input){input=document.createElement('input');input.id='backup-file';input.type='file';input.accept='.json,application/json';input.hidden=true;document.body.appendChild(input);input.addEventListener('change',async e=>{await importBackup(e.target.files[0]);input.value='';});}input.click();break;}
+  case 'export-backup':exportBackup();break;
+  case 'cloud-sync':await syncCloud();break;
+  case 'cloud-logout':KraftlogCloud.logout();cloudConflict=false;setCloudStatus('Online abgemeldet. Lokal weiter nutzbar.');render();break;
+  case 'cloud-use-remote':{
+    if(!confirm('Wirklich die Cloud-Version laden? Nicht synchronisierte Änderungen auf diesem Gerät gehen verloren.'))break;
+    await syncCloud({forceRemote:true});render();break;
+  }
+  case 'cloud-use-local':{
+    if(!confirm('Wirklich diese Geräte-Version in der Cloud speichern? Änderungen eines anderen Geräts gehen dadurch verloren.'))break;
+    await syncCloud({forceLocal:true});render();break;
+  }
+  case 'delete-profile':{if(!confirm('Dieses Profil nur von DIESEM Gerät löschen? Die bereits synchronisierten Cloud-Daten bleiben erhalten. Nicht synchronisierte lokale Änderungen gehen verloren.'))break;await flush();accounts=accounts.filter(a=>a.id!==currentId);writeAccounts();currentId=null;currentKey=null;data=null;modal=null;authMode=accounts.length?'login':'new';render();toast('Lokales Profil gelöscht');break;}
+ }
+ }catch(err){console.error(err);toast('Ein Fehler ist aufgetreten.');}}
+
+document.addEventListener('click',handleClick);
+document.addEventListener('submit',async e=>{
+ if(e.target.id!=='cloud-link-form'&&e.target.id!=='cloud-restore-form')return;
+ e.preventDefault();const form=e.target;
+ const buttons=[...form.querySelectorAll('button[type=submit]')];buttons.forEach(b=>b.disabled=true);
+ try{if(form.id==='cloud-link-form')await linkCloud(form,e.submitter?.value||'login');else await restoreCloud(form);}
+ catch(err){console.warn('Cloud-Anmeldung:',err);toast(err.message);setCloudStatus('Cloud: '+err.message);}
+ finally{buttons.forEach(b=>{if(b.isConnected)b.disabled=false;});}
+});
+document.addEventListener('submit',async e=>{if(e.target.id!=='auth-form')return;e.preventDefault();const form=e.target,btn=form.querySelector('button[type=submit]');btn.disabled=true;btn.textContent='Verschlüsselung wird vorbereitet …';try{const fd=new FormData(form),pw=String(fd.get('password')||'');if(pw.length<8)throw new Error('Das Passwort braucht mindestens 8 Zeichen.');if(authMode==='new'||!accounts.length){const name=String(fd.get('name')||'').trim();if(!name)throw new Error('Bitte Namen eingeben.');if(pw!==fd.get('confirm'))throw new Error('Die Passwörter stimmen nicht überein.');await createProfile(name,pw);}else await openProfile(String(fd.get('profile')),pw);}catch(err){console.warn(err);toast(err?.name==='OperationError'?'Passwort falsch oder Backup beschädigt':err.message==='Profil beschädigt'?err.message:err.message||'Anmeldung fehlgeschlagen');}finally{if(btn.isConnected){btn.disabled=false;btn.textContent=authMode==='new'?'Profil erstellen →':'Profil öffnen →';}}});
+document.addEventListener('input',e=>{const t=e.target;if(t.matches('[data-set-field]')){const ex=session()?.exercises.find(x=>x.id===t.dataset.ex),set=ex?.sets.find(s=>s.id===t.dataset.set);if(!set)return;let v=t.value.replace(',','.');if(v!==''&&Number(v)<0)v='';set[t.dataset.setField]=v;if(validSet(set))set.recordedAt=new Date().toISOString();session().updatedAt=new Date().toISOString();save();const vEl=el('volume-'+ex.id);if(vEl)vEl.textContent=fmt(exVolume(ex))+' kg';const sEl=el('setcount-'+ex.id);if(sEl)sEl.textContent=exSetCount(ex);syncVolume();}else if(t.id==='plan-name'&&modal?.type==='editPlan'){modal.draft.name=t.value;}else if(t.id==='library-search'){libraryQuery=t.value;const pos=t.selectionStart;render();const input=el('library-search');input.focus();input.setSelectionRange(pos,pos);}});
+document.addEventListener('change',e=>{const t=e.target;if(t.id==='training-date')setDay(t.value);else if(t.id==='choose-plan'&&modal?.type==='choosePlan'){const p=data.plans.find(p=>p.id===t.value);modal.planId=t.value;modal.ids=[...(p?.exerciseIds||[])];renderModal();}else if(t.matches('[data-select-ex]')&&modal){const a=modal.type==='choosePlan'?modal.ids:modal.type==='editPlan'?modal.draft.exerciseIds:null;if(!a)return;const id=t.dataset.selectEx,idx=a.indexOf(id);if(t.checked&&idx<0)a.push(id);else if(!t.checked&&idx>=0)a.splice(idx,1);refreshModalKeepScroll();}else if(t.id==='stat-exercise'){statExercise=t.value;render();}});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&modal){modal=null;renderModal();}});
+
+(function start(){try{if(!window.crypto?.subtle){el('app').innerHTML='<main class="auth-layout"><h1>Ein sicherer Browser ist nötig</h1><p>Für die Verschlüsselung muss die App über HTTPS laufen, zum Beispiel auf GitHub Pages. Öffne sie dort in Safari oder Chrome.</p></main>';return;}accounts=safeGetAccounts();authMode=accounts.length?'login':'new';render();if('serviceWorker' in navigator&&location.protocol==='https:'){navigator.serviceWorker.register('./sw.js').catch(e=>console.info('Offline-Modus nicht verfügbar',e));}}catch(err){console.error(err);el('app').textContent='Der lokale Browser-Speicher ist nicht verfügbar. Bitte verwende einen normalen Browsermodus.';}})();
+
+/* In regelmäßigen Abständen Cloud-Änderungen prüfen (auch nach einem App-Update). */
+window.addEventListener('online',()=>{if(isLinked())syncCloud();});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&isLinked())syncCloud();});
+setInterval(()=>{if(isLinked()&&!document.hidden)syncCloud();},5*60*1000);

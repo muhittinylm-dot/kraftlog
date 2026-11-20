@@ -1,0 +1,15 @@
+{
+  "name": "KRAFTLOG – Mein Training",
+  "short_name": "KRAFTLOG",
+  "description": "Privates Trainingstagebuch für Übungen, Sätze, Gewichte und Trainingsvolumen.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0c1219",
+  "theme_color": "#101720",
+  "lang": "de",
+  "icons": [
+    {"src":"./icon-192.png","sizes":"192x192","type":"image/png","purpose":"any maskable"},
+    {"src":"./icon-512.png","sizes":"512x512","type":"image/png","purpose":"any maskable"}
+  ]
+}
