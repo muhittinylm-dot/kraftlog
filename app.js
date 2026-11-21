@@ -1,4 +1,4 @@
-/* KRAFTLOG 2.0 – lokale Verschlüsselung mit optionaler Cloud-Synchronisierung. */
+/* KRAFTLOG 2.1 – Trainingswerte vom letzten Mal übernehmen; bestehender Speicher & Cloud unverändert. */
 'use strict';
 const STORE = 'kraftlog.profiles.v1';
 const GROUPS = ['Alle','Brust','Rücken','Schultern','Beine','Bauch','Arme'];
@@ -126,6 +126,24 @@ function session(){return data?.sessions.find(s=>s.date===selectedDate)||null;}
 function ensureSession(){let s=session();if(s)return s;s={id:uid(),date:selectedDate,createdAt:new Date().toISOString(),updatedAt:new Date().toISOString(),planId:null,planName:'Freies Training',exercises:[]};data.sessions.push(s);return s;}
 function addExerciseToSession(id){const s=ensureSession();if(s.exercises.some(e=>e.id===id))return false;s.exercises.push({id,sets:[{id:uid(),kg:'',reps:''},{id:uid(),kg:'',reps:''},{id:uid(),kg:'',reps:''}]});s.updatedAt=new Date().toISOString();save();return true;}
 function priorExercise(id){return data.sessions.filter(s=>s.date<selectedDate).sort((a,b)=>b.date.localeCompare(a.date)).map(s=>({date:s.date,ex:s.exercises.find(e=>e.id===id)})).find(x=>x.ex&&x.ex.sets.some(validSet))||null;}
+// Historische Sätze sind NUR Vorlagen. Bis zur manuellen Übernahme zählen sie nicht als Training.
+function previousValidSets(id){return priorExercise(id)?.ex.sets.filter(validSet)||[];}
+function hasSetField(v){return v!==''&&v!=null;}
+function applyPreviousSet(target, source, field=null){
+ if(!target||!source||!validSet(source))return false;
+ const keys=field?[field]:['kg','reps'];let changed=false;
+ for(const key of keys){
+   if(key!=='kg'&&key!=='reps')continue;
+   if(field||!hasSetField(target[key])){
+     const value=String(source[key]);
+     if(String(target[key]??'')!==value){target[key]=value;changed=true;}
+   }
+ }
+ if(changed&&validSet(target))target.recordedAt=new Date().toISOString();
+ return changed;
+}
+function commitPriorChange(){const s=session();if(!s)return;s.updatedAt=new Date().toISOString();save();render();}
+
 function exerciseEntries(id){return data.sessions.flatMap(s=>s.exercises.filter(e=>e.id===id&&e.sets.some(validSet)).map(ex=>({date:s.date,volume:exVolume(ex),peak:exPeak(ex),count:exSetCount(ex),ex})) ).sort((a,b)=>a.date.localeCompare(b.date));}
 const allEntries=()=>data.sessions.flatMap(s=>s.exercises.filter(e=>e.sets.some(validSet)).map(e=>({date:s.date,ex:e})));
 
@@ -186,7 +204,23 @@ function renderShell(){const count=data.sessions.filter(s=>s.exercises.some(e=>e
 function renderDateBar(){return `<div class="card date-bar"><div class="date-label">${escapeHTML(longDate(selectedDate))}</div><button class="btn btn-small btn-icon" data-action="shift-date" data-days="-1" aria-label="Vorheriger Tag">‹</button><input class="input input-sm input-date" type="date" id="training-date" value="${selectedDate}" aria-label="Trainingstag wählen"><button class="btn btn-small btn-icon" data-action="shift-date" data-days="1" aria-label="Nächster Tag">›</button><button class="btn btn-small" data-action="today-date">Heute</button></div>`;}
 function renderToday(){const s=session();const entries=s?s.exercises:[],sets=entries.reduce((n,e)=>n+exSetCount(e),0),vol=entries.reduce((n,e)=>n+exVolume(e),0);return `<section class="hero"><span class="eyebrow">DEIN TRAININGSLOG</span><h2>Jeder Satz zählt.</h2><p>Wähle einen Tag, starte deinen Plan und halte deine Gewichte fest. Deinen Fortschritt siehst du im Verlauf.</p><div class="hero-footer"><span class="stat-pill"><strong>${entries.length}</strong> Übungen</span><span class="stat-pill"><strong id="day-set-count">${sets}</strong> erfasste Sätze</span><span class="stat-pill"><strong id="day-vol-total">${fmt(vol)} kg</strong> Volumen</span></div></section>${renderDateBar()}<div class="section-header"><h2>Dein Training</h2><span class="subtitle">${s?escapeHTML(s.planName)+(s.updatedAt?' · '+new Date(s.updatedAt).toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'}):''):'Noch nicht gestartet'}</span></div><div class="btn-wrap" style="margin-bottom:13px"><button class="btn btn-primary" data-action="open-plan-picker">▤ Trainingsplan auswählen</button><button class="btn" data-action="switch-tab" data-tab="library">＋ Übung hinzufügen</button></div>${entries.length?`<div class="stack">${entries.map(e=>renderSessionExercise(e)).join('')}</div>`:`<div class="empty"><span class="empty-icon">◎</span><strong>Noch keine Übungen für diesen Tag</strong><p>Wähle einen fertigen Plan oder füge einzelne Übungen hinzu. Du kannst alles jederzeit ändern.</p><button class="btn btn-secondary" data-action="open-plan-picker">Plan auswählen</button></div>`}${renderRecentDates()}`;}
 function renderRecentDates(){const dates=data.sessions.filter(s=>s.exercises.some(e=>e.sets.some(validSet))).sort((a,b)=>b.date.localeCompare(a.date)).slice(0,5);if(!dates.length)return '';return `<div class="section-header"><h3>Letzte Trainingstage</h3></div><div class="card stack">${dates.map(s=>`<button class="btn btn-ghost" style="justify-content:space-between" data-action="jump-date" data-date="${s.date}"><span>${shortDate(s.date)} · ${escapeHTML(s.planName||'Freies Training')}</span><span class="accent">${fmt(s.exercises.reduce((sum,e)=>sum+exVolume(e),0))} kg →</span></button>`).join('')}</div>`;}
-function renderSessionExercise(e){const ex=getEx(e.id),previous=priorExercise(e.id),volume=exVolume(e),n=exSetCount(e);return `<article class="card exercise-card"><div class="ex-head">${artBox(ex)}<div class="ex-info"><h3>${escapeHTML(ex.name)}</h3><p>${escapeHTML(ex.group)} · ${escapeHTML(ex.equipment)}</p><p class="ex-date">${previous?'Letztes Training: '+shortDate(previous.date):'Noch kein früherer Eintrag'}</p></div><button class="btn btn-icon btn-small btn-ghost" aria-label="Übung entfernen" title="Übung entfernen" data-action="remove-ex" data-ex="${ex.id}">×</button></div><div class="ex-detail">${previous?`<div class="ex-history"><strong>Zuletzt · ${shortDate(previous.date)}:</strong> ${previous.ex.sets.filter(validSet).map(s=>`${fmt(s.kg)} kg × ${fmt(s.reps)}`).join(' · ')}<br><span>Volumen: ${fmt(exVolume(previous.ex))} kg</span></div>`:''}<div class="sets-table">${e.sets.map((s,i)=>`<div class="set-row"><span class="set-num">${i+1}</span><div class="set-col"><label for="kg-${escapeHTML(s.id)}">GEWICHT (KG)</label><input id="kg-${escapeHTML(s.id)}" class="input input-sm" type="number" inputmode="decimal" min="0" max="9999" step="0.5" placeholder="kg" data-set-field="kg" data-ex="${ex.id}" data-set="${escapeHTML(s.id)}" value="${escapeHTML(s.kg)}" aria-label="Gewicht für Satz ${i+1}"></div><div class="set-col"><label for="reps-${escapeHTML(s.id)}">WIEDERHOLUNGEN</label><input id="reps-${escapeHTML(s.id)}" class="input input-sm" type="number" inputmode="numeric" min="1" max="9999" step="1" placeholder="Wdh." data-set-field="reps" data-ex="${ex.id}" data-set="${escapeHTML(s.id)}" value="${escapeHTML(s.reps)}" aria-label="Wiederholungen für Satz ${i+1}"></div><button class="btn btn-icon btn-small btn-ghost" style="margin-bottom:3px" data-action="remove-set" data-ex="${ex.id}" data-set="${escapeHTML(s.id)}" aria-label="Satz löschen" title="Satz löschen">×</button></div>`).join('')}</div><div class="ex-foot"><button class="btn btn-small" data-action="add-set" data-ex="${ex.id}">＋ Satz hinzufügen</button><span class="small muted">Volumen: <strong class="vol" id="volume-${ex.id}">${fmt(volume)} kg</strong> · <span id="setcount-${ex.id}">${n}</span> Sätze</span></div></div></article>`;}
+function renderSetRow(e,set,index,priorSets){
+ const old=priorSets[index],done=validSet(set),name=escapeHTML(getEx(e.id).name);
+ const copyField=(field,unit)=>old?`<button type="button" class="set-suggestion" data-action="copy-prior-field" data-ex="${escapeHTML(e.id)}" data-index="${index}" data-field="${field}" title="Letzten Wert einsetzen: ${fmt(old[field])} ${unit}" aria-label="${name}, Satz ${index+1}: ${fmt(old[field])} ${unit} vom letzten Training übernehmen">↳ ${fmt(old[field])} ${unit}</button>`:'<span class="set-no-suggestion" aria-hidden="true"></span>';
+ return `<div class="set-row ${done?'set-row-done':''}" data-set-row="${escapeHTML(set.id)}">
+ <span class="set-num">${index+1}</span>
+ <div class="set-col"><label for="kg-${escapeHTML(set.id)}">GEWICHT (KG)</label><input id="kg-${escapeHTML(set.id)}" class="input input-sm ${old&&!hasSetField(set.kg)?'input-has-suggestion':''}" type="number" inputmode="decimal" min="0" max="9999" step="0.5" placeholder="${old?fmt(old.kg):'kg'}" data-set-field="kg" data-ex="${escapeHTML(e.id)}" data-set="${escapeHTML(set.id)}" value="${escapeHTML(set.kg)}" aria-label="Gewicht für Satz ${index+1}${old?'; zuletzt '+fmt(old.kg)+' kg':''}">${copyField('kg','kg')}</div>
+ <div class="set-col"><label for="reps-${escapeHTML(set.id)}">WIEDERHOLUNGEN</label><input id="reps-${escapeHTML(set.id)}" class="input input-sm ${old&&!hasSetField(set.reps)?'input-has-suggestion':''}" type="number" inputmode="numeric" min="1" max="9999" step="1" placeholder="${old?fmt(old.reps):'Wdh.'}" data-set-field="reps" data-ex="${escapeHTML(e.id)}" data-set="${escapeHTML(set.id)}" value="${escapeHTML(set.reps)}" aria-label="Wiederholungen für Satz ${index+1}${old?'; zuletzt '+fmt(old.reps):''}">${copyField('reps','Wdh.')}</div>
+ <div class="set-row-actions">${done?`<span class="set-done" title="Satz erfasst" aria-label="Satz ${index+1} erfasst">✓</span>`:old?`<button class="set-accept" type="button" data-action="copy-prior-set" data-ex="${escapeHTML(e.id)}" data-index="${index}" title="Fehlende Werte aus dem letzten Satz übernehmen" aria-label="Satz ${index+1} vom letzten Training übernehmen">✓</button>`:'<span class="set-action-spacer" aria-hidden="true"></span>'}<button class="btn btn-small btn-ghost set-remove" data-action="remove-set" data-ex="${escapeHTML(e.id)}" data-set="${escapeHTML(set.id)}" aria-label="Satz ${index+1} löschen" title="Satz löschen">×</button></div>
+ </div>`;
+}
+function renderSessionExercise(e){
+ const ex=getEx(e.id),previous=priorExercise(e.id),priorSets=previous?previous.ex.sets.filter(validSet):[],volume=exVolume(e),n=exSetCount(e);
+ return `<article class="card exercise-card"><div class="ex-head">${artBox(ex)}<div class="ex-info"><h3>${escapeHTML(ex.name)}</h3><p>${escapeHTML(ex.group)} · ${escapeHTML(ex.equipment)}</p><p class="ex-date">${previous?'Letztes Training: '+shortDate(previous.date):'Noch kein früherer Eintrag'}</p></div><button class="btn btn-icon btn-small btn-ghost" aria-label="Übung entfernen" title="Übung entfernen" data-action="remove-ex" data-ex="${escapeHTML(ex.id)}">×</button></div><div class="ex-detail">
+ ${previous?`<div class="ex-history"><strong>Zuletzt · ${shortDate(previous.date)}:</strong> ${priorSets.map(s=>`${fmt(s.kg)} kg × ${fmt(s.reps)}`).join(' · ')}<br><span>Volumen: ${fmt(exVolume(previous.ex))} kg</span></div><div class="prior-control"><p>Die grünen Zahlen sind Vorschläge. Erst beim Übernehmen oder eigenen Eintragen werden Sätze gespeichert.</p><button type="button" class="btn btn-secondary btn-small btn-block" data-action="copy-prior-all" data-ex="${escapeHTML(e.id)}">✓ Alle letzten Sätze übernehmen</button></div>`:''}
+ <div class="sets-table">${e.sets.map((s,i)=>renderSetRow(e,s,i,priorSets)).join('')}</div>
+ <div class="ex-foot"><button class="btn btn-small" data-action="add-set" data-ex="${escapeHTML(ex.id)}">＋ Satz hinzufügen</button><span class="small muted">Volumen: <strong class="vol" id="volume-${escapeHTML(ex.id)}">${fmt(volume)} kg</strong> · <span id="setcount-${escapeHTML(ex.id)}">${n}</span> Sätze</span></div></div></article>`;
+}
 function renderFilters(active){return `<div class="filters">${GROUPS.map(g=>`<button class="chip ${g===active?'active':''}" data-action="filter-group" data-group="${g}">${g}</button>`).join('')}</div>`;}
 function renderLibrary(){const s=session(),selected=new Set(s?.exercises.map(e=>e.id)||[]),exs=allExercises().filter(ex=>(libraryGroup==='Alle'||ex.group===libraryGroup)&&(ex.name+' '+ex.equipment).toLowerCase().includes(libraryQuery.toLowerCase()));return `<div class="section-header"><div><h2>Übungen</h2><div class="intro">Tippe auf „Hinzufügen“, um die Übung für ${shortDate(selectedDate)} zu verwenden.</div></div></div><div class="library-tools"><input class="input" id="library-search" value="${escapeHTML(libraryQuery)}" placeholder="Übung suchen, z. B. Latzug …" autocomplete="off">${renderFilters(libraryGroup)}</div><div class="exercise-grid" id="library-results">${exs.map(ex=>`<article class="library-card"><button class="library-art" type="button" data-action="exercise-info" data-ex="${escapeHTML(ex.id)}" aria-label="Bild und Erklärung: ${escapeHTML(ex.name)}">${art(ex.art)}</button><div><h3>${escapeHTML(ex.name)}</h3><p>${escapeHTML(ex.group)} · ${escapeHTML(ex.equipment)}</p></div><button class="btn btn-small ${selected.has(ex.id)?'btn-secondary':'btn-primary'} btn-block" data-action="toggle-exercise" data-ex="${escapeHTML(ex.id)}">${selected.has(ex.id)?'✓ Ausgewählt':'＋ Hinzufügen'}</button></article>`).join('')}</div>${!exs.length?`<div class="empty">Keine passende Übung gefunden.</div>`:''}<div class="section-header"><h3>Eigene Übung fehlt?</h3></div><button class="btn btn-ghost btn-block" data-action="new-exercise">＋ Eigene Übung anlegen</button><div class="notice">Die Bilder sind vereinfachte Zeichnungen zur Orientierung, keine offiziellen Gerätebilder von FitX. Prüfe am Gerät die tatsächliche Ausführung.</div>`;}
 function renderPlans(){return `<div class="section-header"><div><h2>Deine Trainingspläne</h2><p class="intro">Erstelle Pläne oder passe die Vorschläge an. Vor jedem Training kannst du Übungen an- und abwählen.</p></div></div><div class="stack">${data.plans.map(p=>`<article class="card plan-card"><div class="plan-art"></div><h3>${escapeHTML(p.name)}</h3><p>${p.exerciseIds.length} Übungen</p><div class="chiplist">${p.exerciseIds.slice(0,7).map(id=>`<span>${escapeHTML(getEx(id).name)}</span>`).join('')}${p.exerciseIds.length>7?`<span>+${p.exerciseIds.length-7}</span>`:''}</div><div class="btn-wrap"><button class="btn btn-primary btn-small" data-action="start-plan" data-plan="${p.id}">Für ${shortDate(selectedDate)} verwenden</button><button class="btn btn-small" data-action="edit-plan" data-plan="${p.id}">Bearbeiten</button></div></article>`).join('')}</div><button class="btn btn-secondary btn-block" style="margin-top:12px" data-action="edit-plan" data-plan="">＋ Eigenen Trainingsplan erstellen</button>`;}
@@ -331,6 +365,30 @@ async function handleClick(event){const btn=event.target.closest('[data-action]'
   case 'filter-group':libraryGroup=btn.dataset.group;render();break;
   case 'toggle-exercise':{const id=btn.dataset.ex,s=session();if(s?.exercises.some(e=>e.id===id)){const ent=s.exercises.find(e=>e.id===id);if(ent.sets.some(validSet)&&!confirm('Die eingetragenen Sätze dieser Übung für diesen Tag wirklich löschen?'))break;s.exercises=s.exercises.filter(e=>e.id!==id);save();toast('Übung entfernt');}else{addExerciseToSession(id);toast('Übung hinzugefügt');}render();break;}
   case 'remove-ex':{const s=session(),ent=s?.exercises.find(e=>e.id===btn.dataset.ex);if(!ent)break;if(ent.sets.some(validSet)&&!confirm('Diese Übung und ihre Sätze für diesen Tag löschen?'))break;s.exercises=s.exercises.filter(e=>e!==ent);save();render();toast('Übung entfernt');break;}
+  case 'copy-prior-field':{
+    const ex=session()?.exercises.find(e=>e.id===btn.dataset.ex),index=Number(btn.dataset.index),old=previousValidSets(btn.dataset.ex)[index];
+    if(!ex||!Number.isInteger(index)||index<0||index>=ex.sets.length||!['kg','reps'].includes(btn.dataset.field)||!old)break;
+    if(applyPreviousSet(ex.sets[index],old,btn.dataset.field)){commitPriorChange();toast(btn.dataset.field==='kg'?'Letztes Gewicht übernommen':'Letzte Wiederholungen übernommen');}
+    break;
+  }
+  case 'copy-prior-set':{
+    const ex=session()?.exercises.find(e=>e.id===btn.dataset.ex),index=Number(btn.dataset.index),old=previousValidSets(btn.dataset.ex)[index];
+    if(!ex||!Number.isInteger(index)||index<0||index>=ex.sets.length||!old)break;
+    if(applyPreviousSet(ex.sets[index],old)){commitPriorChange();toast(`Satz ${index+1} übernommen`);}
+    break;
+  }
+  case 'copy-prior-all':{
+    const ex=session()?.exercises.find(e=>e.id===btn.dataset.ex),oldSets=previousValidSets(btn.dataset.ex);
+    if(!ex||!oldSets.length)break;
+    let changed=false;
+    oldSets.forEach((old,i)=>{
+      if(!ex.sets[i]){ex.sets.push({id:uid(),kg:'',reps:''});changed=true;}
+      if(applyPreviousSet(ex.sets[i],old))changed=true;
+    });
+    if(changed){commitPriorChange();toast('Letzte Sätze übernommen – Gewichte und Wiederholungen anpassbar');}
+    else toast('Alle vorgeschlagenen Werte sind bereits eingetragen');
+    break;
+  }
   case 'add-set':{const ex=session()?.exercises.find(e=>e.id===btn.dataset.ex);if(!ex)break;ex.sets.push({id:uid(),kg:'',reps:''});save();render();break;}
   case 'remove-set':{const ex=session()?.exercises.find(e=>e.id===btn.dataset.ex);if(!ex)break;const set=ex.sets.find(s=>s.id===btn.dataset.set);if(set&&validSet(set)&&!confirm('Erfassten Satz wirklich löschen?'))break;ex.sets=ex.sets.filter(s=>s!==set);if(!ex.sets.length)ex.sets.push({id:uid(),kg:'',reps:''});save();render();break;}
   case 'open-plan-picker':{const p=data.plans[0];modal={type:'choosePlan',planId:p?.id,ids:[...(p?.exerciseIds||[])]};renderModal();break;}
@@ -371,7 +429,36 @@ document.addEventListener('submit',async e=>{
  finally{buttons.forEach(b=>{if(b.isConnected)b.disabled=false;});}
 });
 document.addEventListener('submit',async e=>{if(e.target.id!=='auth-form')return;e.preventDefault();const form=e.target,btn=form.querySelector('button[type=submit]');btn.disabled=true;btn.textContent='Verschlüsselung wird vorbereitet …';try{const fd=new FormData(form),pw=String(fd.get('password')||'');if(pw.length<8)throw new Error('Das Passwort braucht mindestens 8 Zeichen.');if(authMode==='new'||!accounts.length){const name=String(fd.get('name')||'').trim();if(!name)throw new Error('Bitte Namen eingeben.');if(pw!==fd.get('confirm'))throw new Error('Die Passwörter stimmen nicht überein.');await createProfile(name,pw);}else await openProfile(String(fd.get('profile')),pw);}catch(err){console.warn(err);toast(err?.name==='OperationError'?'Passwort falsch oder Backup beschädigt':err.message==='Profil beschädigt'?err.message:err.message||'Anmeldung fehlgeschlagen');}finally{if(btn.isConnected){btn.disabled=false;btn.textContent=authMode==='new'?'Profil erstellen →':'Profil öffnen →';}}});
-document.addEventListener('input',e=>{const t=e.target;if(t.matches('[data-set-field]')){const ex=session()?.exercises.find(x=>x.id===t.dataset.ex),set=ex?.sets.find(s=>s.id===t.dataset.set);if(!set)return;let v=t.value.replace(',','.');if(v!==''&&Number(v)<0)v='';set[t.dataset.setField]=v;if(validSet(set))set.recordedAt=new Date().toISOString();session().updatedAt=new Date().toISOString();save();const vEl=el('volume-'+ex.id);if(vEl)vEl.textContent=fmt(exVolume(ex))+' kg';const sEl=el('setcount-'+ex.id);if(sEl)sEl.textContent=exSetCount(ex);syncVolume();}else if(t.id==='plan-name'&&modal?.type==='editPlan'){modal.draft.name=t.value;}else if(t.id==='library-search'){libraryQuery=t.value;const pos=t.selectionStart;render();const input=el('library-search');input.focus();input.setSelectionRange(pos,pos);}});
+document.addEventListener('input',e=>{
+ const t=e.target;
+ if(t.matches('[data-set-field]')){
+   const ex=session()?.exercises.find(x=>x.id===t.dataset.ex),set=ex?.sets.find(s=>s.id===t.dataset.set);
+   if(!set)return;
+   let v=t.value.replace(',','.');if(v!==''&&Number(v)<0)v='';
+   set[t.dataset.setField]=v;
+   if(validSet(set))set.recordedAt=new Date().toISOString();
+   session().updatedAt=new Date().toISOString();save();
+   const index=ex.sets.indexOf(set),old=previousValidSets(ex.id)[index];
+   t.classList.toggle('input-has-suggestion',Boolean(old)&&!hasSetField(set[t.dataset.setField]));
+   const row=t.closest('[data-set-row]');
+   if(row){
+     const done=validSet(set);
+     row.classList.toggle('set-row-done',done);
+     const action=row.querySelector('.set-accept,.set-done,.set-action-spacer');
+     if(action){
+       if(done)action.outerHTML='<span class="set-done" title="Satz erfasst" aria-label="Satz erfasst">✓</span>';
+       else if(old)action.outerHTML='<button type="button" class="set-accept" data-action="copy-prior-set" data-ex="'+escapeHTML(ex.id)+'" data-index="'+index+'" aria-label="Letzte Satzwerte übernehmen" title="Fehlende Werte übernehmen">✓</button>';
+       else action.outerHTML='<span class="set-action-spacer" aria-hidden="true"></span>';
+     }
+   }
+   const vEl=el('volume-'+ex.id);if(vEl)vEl.textContent=fmt(exVolume(ex))+' kg';
+   const sEl=el('setcount-'+ex.id);if(sEl)sEl.textContent=exSetCount(ex);
+   syncVolume();
+ }else if(t.id==='plan-name'&&modal?.type==='editPlan')modal.draft.name=t.value;
+ else if(t.id==='library-search'){
+   libraryQuery=t.value;const pos=t.selectionStart;render();const input=el('library-search');input.focus();input.setSelectionRange(pos,pos);
+ }
+});
 document.addEventListener('change',e=>{const t=e.target;if(t.id==='training-date')setDay(t.value);else if(t.id==='choose-plan'&&modal?.type==='choosePlan'){const p=data.plans.find(p=>p.id===t.value);modal.planId=t.value;modal.ids=[...(p?.exerciseIds||[])];renderModal();}else if(t.matches('[data-select-ex]')&&modal){const a=modal.type==='choosePlan'?modal.ids:modal.type==='editPlan'?modal.draft.exerciseIds:null;if(!a)return;const id=t.dataset.selectEx,idx=a.indexOf(id);if(t.checked&&idx<0)a.push(id);else if(!t.checked&&idx>=0)a.splice(idx,1);refreshModalKeepScroll();}else if(t.id==='stat-exercise'){statExercise=t.value;render();}});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&modal){modal=null;renderModal();}});
 

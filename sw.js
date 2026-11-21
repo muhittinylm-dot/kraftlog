@@ -1,6 +1,6 @@
 /* App-Dateien sind versionsabhängig, Nutzerdaten werden ausdrücklich NICHT gecacht oder gelöscht. */
-const CACHE_NAME = 'kraftlog-offline-v2';
-const ASSETS = ['./', './index.html', './app.css?v=2', './app.js?v=2', './cloud.js?v=2', './cloud-config.js?v=2', './manifest.webmanifest', './icon-192.png', './icon-512.png'];
+const CACHE_NAME = 'kraftlog-offline-v21';
+const ASSETS = ['./', './index.html', './app.css?v=21', './app.js?v=21', './cloud.js?v=21', './cloud-config.js?v=21', './manifest.webmanifest', './icon-192.png', './icon-512.png'];
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS)).then(() => self.skipWaiting()));
 });
