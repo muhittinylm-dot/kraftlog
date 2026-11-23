@@ -1,0 +1,2 @@
+KRAFTLOG Update v5
+Wichtiger Hinweis: Die bestehende cloud-config.js im Repository unverändert lassen und nicht mit einer Platzhalterdatei überschreiben.
