@@ -1,42 +1,51 @@
-/* KRAFTLOG 3.0 – Mini-Gym Booster, Gamification, Timer und neues Travertin-Design. */
+/* KRAFTLOG 4.0 – Cardio, Brown Modern Style, Booster-Packs, Mini-Gym 2.0 und Passwortwechsel. */
 'use strict';
 const STORE = 'kraftlog.profiles.v1';
-const GROUPS = ['Alle','Brust','Rücken','Schultern','Beine','Bauch','Arme'];
+
+const GROUPS = ['Alle','Brust','Rücken','Schultern','Beine','Bauch','Arme','Cardio'];
 const EXERCISES = [
-  ['butterfly','Butterfly','Brust','Maschine','fly'],
-  ['brustpresse','Brustpresse','Brust','Maschine','chest'],
-  ['schraegpresse','Schrägbrustpresse','Brust','Maschine','chest'],
-  ['bankdruecken','Bankdrücken','Brust','Freihantel','bench'],
-  ['schraegbank','Schrägbank-Kurzhanteln','Brust','Freihantel','bench'],
-  ['kabelflys','Kabel-Flys','Brust','Kabelzug','fly'],
-  ['latzug','Latzug breit','Rücken','Maschine','lat'],
-  ['latzugeng','Latzug eng','Rücken','Maschine','lat'],
-  ['rudern','Rudern sitzend','Rücken','Maschine','row'],
-  ['rudernlh','Langhantelrudern','Rücken','Freihantel','hinge'],
-  ['klimmzuege','Klimmzüge','Rücken','Körpergewicht','pull'],
-  ['rueckenstrecker','Rückenstrecker','Rücken','Maschine','hinge'],
-  ['reversebutterfly','Reverse Butterfly','Schultern','Maschine','fly'],
-  ['schulterpresse','Schulterpresse','Schultern','Maschine','overhead'],
-  ['seitheben','Seitheben','Schultern','Freihantel','lateral'],
-  ['facepulls','Face Pulls','Schultern','Kabelzug','cable'],
-  ['beinpresse','Beinpresse','Beine','Maschine','legpress'],
-  ['beinstrecker','Beinstrecker','Beine','Maschine','legextension'],
-  ['beinbeuger','Beinbeuger','Beine','Maschine','legcurl'],
-  ['kniebeugen','Kniebeugen','Beine','Freihantel','squat'],
-  ['kreuzheben','Kreuzheben','Beine','Freihantel','hinge'],
-  ['abduktoren','Abduktoren','Beine','Maschine','hip'],
-  ['adduktoren','Adduktoren','Beine','Maschine','hip'],
-  ['wadenheben','Wadenheben','Beine','Maschine','calves'],
-  ['bauchmaschine','Bauchmaschine','Bauch','Maschine','abs'],
-  ['cablecrunch','Kabel-Crunches','Bauch','Kabelzug','abs'],
-  ['beinheben','Hängendes Beinheben','Bauch','Körpergewicht','pull'],
-  ['bizepscurls','Bizepscurls','Arme','Freihantel','curl'],
-  ['bizepsmaschine','Bizepsmaschine','Arme','Maschine','curl'],
-  ['hammercurls','Hammer-Curls','Arme','Freihantel','curl'],
-  ['trizepsdruecken','Trizepsdrücken','Arme','Kabelzug','cable'],
-  ['trizepsueberkopf','Trizeps über Kopf','Arme','Freihantel','overhead'],
-  ['dips','Dips','Arme','Körpergewicht','chest']
-].map(([id,name,group,equipment,art])=>({id,name,group,equipment,art}));
+  ['butterfly','Butterfly','Brust','Maschine','fly','strength'],
+  ['brustpresse','Brustpresse','Brust','Maschine','chest','strength'],
+  ['schraegpresse','Schrägbrustpresse','Brust','Maschine','chest','strength'],
+  ['bankdruecken','Bankdrücken','Brust','Freihantel','bench','strength'],
+  ['schraegbank','Schrägbank-Kurzhanteln','Brust','Freihantel','bench','strength'],
+  ['kabelflys','Kabel-Flys','Brust','Kabelzug','fly','strength'],
+  ['latzug','Latzug breit','Rücken','Maschine','lat','strength'],
+  ['latzugeng','Latzug eng','Rücken','Maschine','lat','strength'],
+  ['rudern','Rudern sitzend','Rücken','Maschine','row','strength'],
+  ['rudernlh','Langhantelrudern','Rücken','Freihantel','hinge','strength'],
+  ['klimmzuege','Klimmzüge','Rücken','Körpergewicht','pull','strength'],
+  ['rueckenstrecker','Rückenstrecker','Rücken','Maschine','hinge','strength'],
+  ['reversebutterfly','Reverse Butterfly','Schultern','Maschine','fly','strength'],
+  ['schulterpresse','Schulterpresse','Schultern','Maschine','overhead','strength'],
+  ['seitheben','Seitheben','Schultern','Freihantel','lateral','strength'],
+  ['facepulls','Face Pulls','Schultern','Kabelzug','cable','strength'],
+  ['beinpresse','Beinpresse','Beine','Maschine','legpress','strength'],
+  ['beinstrecker','Beinstrecker','Beine','Maschine','legextension','strength'],
+  ['beinbeuger','Beinbeuger','Beine','Maschine','legcurl','strength'],
+  ['kniebeugen','Kniebeugen','Beine','Freihantel','squat','strength'],
+  ['kreuzheben','Kreuzheben','Beine','Freihantel','hinge','strength'],
+  ['abduktoren','Abduktoren','Beine','Maschine','hip','strength'],
+  ['adduktoren','Adduktoren','Beine','Maschine','hip','strength'],
+  ['wadenheben','Wadenheben','Beine','Maschine','calves','strength'],
+  ['bauchmaschine','Bauchmaschine','Bauch','Maschine','abs','strength'],
+  ['cablecrunch','Kabel-Crunches','Bauch','Kabelzug','abs','strength'],
+  ['beinheben','Hängendes Beinheben','Bauch','Körpergewicht','pull','strength'],
+  ['bizepscurls','Bizepscurls','Arme','Freihantel','curl','strength'],
+  ['bizepsmaschine','Bizepsmaschine','Arme','Maschine','curl','strength'],
+  ['hammercurls','Hammer-Curls','Arme','Freihantel','curl','strength'],
+  ['trizepsdruecken','Trizepsdrücken','Arme','Kabelzug','cable','strength'],
+  ['trizepsueberkopf','Trizeps über Kopf','Arme','Freihantel','overhead','strength'],
+  ['dips','Dips','Arme','Körpergewicht','chest','strength'],
+  ['laufband','Laufband','Cardio','Gerät','treadmill','cardio'],
+  ['ergometer','Ergometer','Cardio','Gerät','bike','cardio'],
+  ['crosstrainer','Crosstrainer','Cardio','Gerät','elliptical','cardio'],
+  ['rudermaschine','Rudermaschine','Cardio','Gerät','rower','cardio'],
+  ['stepper','Stepper','Cardio','Gerät','stepper','cardio'],
+  ['walking','Walking im Freien','Cardio','Outdoor','walk','cardio'],
+  ['laufen','Laufen im Freien','Cardio','Outdoor','run','cardio'],
+  ['radfahren','Radfahren','Cardio','Outdoor','bike','cardio']
+].map(([id,name,group,equipment,art,mode])=>({id,name,group,equipment,art,mode}));
 const EXERCISE_TIPS = {
  butterfly:'Sitzend die Griffe oder Polster kontrolliert vor der Brust zusammenführen.',
  brustpresse:'Sitzend die Griffe auf Brusthöhe nach vorn drücken.',
@@ -70,51 +79,56 @@ const EXERCISE_TIPS = {
  hammercurls:'Mit neutral gehaltenen Kurzhanteln die Ellenbogen beugen.',
  trizepsdruecken:'Am hohen Kabelzug den Griff nach unten drücken, dabei die Ellenbogen nah am Körper halten.',
  trizepsueberkopf:'Ein Gewicht von hinter dem Kopf nach oben strecken.',
- dips:'Auf parallelen Griffen den Körper durch Beugen und Strecken der Arme bewegen.'
+ dips:'Auf parallelen Griffen den Körper durch Beugen und Strecken der Arme bewegen.',
+ laufband:'Erfasse Dauer, Distanz und Kalorien für deine Laufband-Einheit.',
+ ergometer:'Erfasse Dauer, Distanz und Kalorien auf dem Ergometer.',
+ crosstrainer:'Erfasse Dauer, Distanz und Kalorien auf dem Crosstrainer.',
+ rudermaschine:'Erfasse Dauer, Distanz und Kalorien für dein Rudern.',
+ stepper:'Erfasse Dauer und Kalorien für deinen Stepper-Block.',
+ walking:'Erfasse Dauer, Distanz und Kalorien für deinen Walking-Tag.',
+ laufen:'Erfasse Dauer, Distanz und Kalorien für deinen Lauf.',
+ radfahren:'Erfasse Dauer, Distanz und Kalorien für deine Radtour.'
 };
-const BOOSTER_ITEMS = [
-  {id:'travertine-floor',name:'Travertin-Boden',category:'Boden',icon:'🪨',rarity:'common'},
-  {id:'oak-bench',name:'Eichenbank',category:'Möbel',icon:'🪑',rarity:'common'},
-  {id:'rubber-mats',name:'Gummimatten',category:'Ausstattung',icon:'⬛',rarity:'common'},
-  {id:'mirror-wall',name:'Spiegelwand',category:'Deko',icon:'🪞',rarity:'common'},
-  {id:'protein-shelf',name:'Supplement-Regal',category:'Deko',icon:'🧃',rarity:'common'},
-  {id:'plant-large',name:'Große Pflanze',category:'Deko',icon:'🪴',rarity:'common'},
-  {id:'wall-clock',name:'Wanduhr',category:'Deko',icon:'🕒',rarity:'common'},
-  {id:'foam-roller',name:'Foam Roller',category:'Recovery',icon:'🌀',rarity:'common'},
-  {id:'kettlebell-set',name:'Kettlebell-Set',category:'Gerät',icon:'🏋️',rarity:'common'},
-  {id:'dumbbell-rack',name:'Kurzhantel-Rack',category:'Gerät',icon:'🗄️',rarity:'common'},
-  {id:'chalk-bowl',name:'Chalk Bowl',category:'Ausstattung',icon:'🥣',rarity:'common'},
-  {id:'towel-station',name:'Handtuch-Station',category:'Ausstattung',icon:'🧺',rarity:'common'},
-  {id:'espresso-corner',name:'Espresso-Ecke',category:'Lifestyle',icon:'☕',rarity:'rare'},
-  {id:'neon-sign',name:'Neon-Schild',category:'Deko',icon:'💡',rarity:'rare'},
-  {id:'trophy-case',name:'Trophäen-Vitrine',category:'Deko',icon:'🏆',rarity:'rare'},
-  {id:'massage-chair',name:'Massage-Sessel',category:'Recovery',icon:'💺',rarity:'rare'},
-  {id:'rowing-machine',name:'Rudergerät',category:'Gerät',icon:'🚣',rarity:'rare'},
-  {id:'exercise-bike',name:'Ergometer',category:'Gerät',icon:'🚲',rarity:'rare'},
-  {id:'squat-rack',name:'Squat Rack',category:'Gerät',icon:'🧱',rarity:'rare'},
-  {id:'cable-tower',name:'Kabelturm',category:'Gerät',icon:'🏗️',rarity:'rare'},
-  {id:'locker-wall',name:'Spindwand',category:'Möbel',icon:'🗃️',rarity:'rare'},
-  {id:'whiteboard',name:'PR-Whiteboard',category:'Deko',icon:'📋',rarity:'rare'},
-  {id:'bulldog',name:'Gym-Bulldogge',category:'Haustier',icon:'🐶',rarity:'rare'},
-  {id:'gym-cat',name:'Studio-Katze',category:'Haustier',icon:'🐱',rarity:'rare'},
-  {id:'aquarium',name:'Aquarium',category:'Deko',icon:'🐠',rarity:'rare'},
-  {id:'sports-car',name:'Sportwagen',category:'Auto',icon:'🏎️',rarity:'epic'},
-  {id:'vespa',name:'Vespa',category:'Auto',icon:'🛵',rarity:'epic'},
-  {id:'mini-cooper',name:'Mini Cooper',category:'Auto',icon:'🚗',rarity:'epic'},
-  {id:'sauna-pod',name:'Mini-Sauna',category:'Recovery',icon:'♨️',rarity:'epic'},
-  {id:'ice-bath',name:'Ice Bath',category:'Recovery',icon:'🧊',rarity:'epic'},
-  {id:'golden-barbell',name:'Goldene Langhantel',category:'Legendär',icon:'✨',rarity:'epic'},
-  {id:'grand-piano',name:'Lounge-Piano',category:'Lifestyle',icon:'🎹',rarity:'epic'},
-  {id:'wolf-dog',name:'Wolfshund',category:'Haustier',icon:'🐺',rarity:'epic'},
-  {id:'palm-lounge',name:'Palmen-Lounge',category:'Lifestyle',icon:'🌴',rarity:'epic'}
-];
-const RARITY_LABELS = {common:'Gewöhnlich',rare:'Selten',epic:'Episch'};
+function buildBoosterItems(){
+ const defs=[
+  ['mood','Sand','Stone','Walnut','Cedar','Linen','Ivory','Clay','Graphite','Dune'],
+  ['furniture','Bench','Lounge Chair','Side Table','Console','Bookshelf','Lowboard','Daybed','Pouf','Display Table','Cabinet'],
+  ['decor','Floor Lamp','Pendant Lamp','Wall Shelf','Frame Set','Ceramic Vase','Mirror Panel','Candle Table','Tray Set','Art Panel','Room Divider'],
+  ['plants','Olive Tree','Ficus','Palm','Monstera','Bonsai','Grass Pot','Stone Planter','Hanging Plant','Dry Bouquet','Moss Bowl'],
+  ['pets','House Cat','Bulldog','Rabbit','Golden Retriever','Maine Coon','Turtle','Parrot','Frenchie','Shiba','British Cat'],
+  ['outdoor','Patio Chair','Sun Lounger','Garden Table','Planter Box','Pergola Module','Stone Fountain','Fire Bowl','Outdoor Bench','Lantern Post','Terrace Pot'],
+  ['equipment','Dumbbell Rack','Cable Station','Half Rack','Pilates Bench','Indoor Bike','Rower','Sled Strip','Kettlebell Rack','Mobility Wall','Stretch Corner'],
+  ['storage','Wardrobe','Locker','Drawer Unit','Open Shelf','Shoe Cabinet','Towel Cart','Accessory Case','Magazine Rack','Laundry Tower','Glass Cabinet'],
+  ['art','Minimal Print','Line Art Panel','Stone Sculpture','Travel Photo','Abstract Canvas','Monochrome Poster','Architect Lamp','Magazine Stack','Desk Piece','Object Trio'],
+  ['lifestyle','Espresso Bar','Tea Corner','Record Player','Reading Chair','Writing Desk','Work Nook','Vinyl Shelf','Mini Library','Guest Stool','Studio Clock']
+ ];
+ const items=[];
+ let id=1;
+ defs.forEach(([cat,...names],blockIndex)=>{
+   names.forEach((name,i)=>{
+     const moods=defs[0].slice(1);
+     const label=(cat==='mood'?`${name} Finish`:`${moods[(i+blockIndex)%moods.length]} ${name}`);
+     const rarity=id%17===0?'epic':id%5===0?'rare':'common';
+     items.push({id:`item-${String(id).padStart(3,'0')}`,name:label,category:cat==='mood'?'Material':' '+cat,rarity,code:(label.replace(/[^A-ZÄÖÜa-zäöü0-9]/g,' ').trim().split(/\s+/).slice(0,2).map(x=>x[0]).join('')||'IT').toUpperCase()});
+     id++;
+   });
+ });
+ while(items.length<100){
+   const n=items.length+1;
+   items.push({id:`item-${String(n).padStart(3,'0')}`,name:`Studio Piece ${n}`,category:'Collectible',rarity:n%13===0?'epic':n%4===0?'rare':'common',code:`S${n}`});
+ }
+ return items.slice(0,100);
+}
+const BOOSTER_ITEMS = buildBoosterItems();
+const RARITY_LABELS = {common:'Basis',rare:'Selten',epic:'Signature'};
 const BASE_PLANS = [
   {id:'plan-ganz', name:'Ganzkörper', exerciseIds:['beinpresse','latzug','brustpresse','rudern','schulterpresse','bauchmaschine']},
   {id:'plan-push', name:'Push · Brust & Trizeps', exerciseIds:['brustpresse','schraegpresse','butterfly','schulterpresse','seitheben','trizepsdruecken']},
   {id:'plan-pull', name:'Pull · Rücken & Bizeps', exerciseIds:['latzug','rudern','reversebutterfly','facepulls','bizepscurls','rueckenstrecker']},
-  {id:'plan-beine', name:'Beine & Bauch', exerciseIds:['beinpresse','beinstrecker','beinbeuger','abduktoren','wadenheben','bauchmaschine']}
+  {id:'plan-beine', name:'Beine & Bauch', exerciseIds:['beinpresse','beinstrecker','beinbeuger','abduktoren','wadenheben','bauchmaschine']},
+  {id:'plan-cardio', name:'Cardio-Tag', exerciseIds:['laufband','ergometer','crosstrainer']}
 ];
+
 const $ = (q,root=document)=>root.querySelector(q);
 const el = id=>document.getElementById(id);
 const escapeHTML = x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -124,7 +138,7 @@ const shortDate = d=>new Intl.DateTimeFormat('de-DE',{day:'2-digit',month:'2-dig
 const longDate = d=>new Intl.DateTimeFormat('de-DE',{weekday:'long',day:'numeric',month:'long',year:'numeric'}).format(new Date(d+'T12:00:00'));
 function localDate(dt=new Date()){return `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`;}
 function dateShift(date,n){let d=new Date(date+'T12:00:00');d.setDate(d.getDate()+n);return localDate(d);}
-const baseData=()=>({version:2,plans:BASE_PLANS.map(p=>({...p,exerciseIds:[...p.exerciseIds]})),customExercises:[],sessions:[],inventory:[],equippedItems:[]});
+const baseData=()=>({version:4,plans:BASE_PLANS.map(p=>({...p,exerciseIds:[...p.exerciseIds]})),customExercises:[],sessions:[],inventory:[],equippedItems:[],gymLayout:Array(10).fill(null),gymDesign:{wall:'sand',floor:'walnut',scene:'courtyard'}});
 let accounts=[],currentId=null,currentKey=null,data=null,activeTab='today',selectedDate=localDate();
 let libraryGroup='Alle',libraryQuery='',statExercise='latzug',statMetric='volume',modal=null,authMode='new',saveQueue=Promise.resolve(),toastTimer=null,appError='';
 let cloudStatus='Noch nicht verbunden',cloudConflict=false,cloudBusy=false,cloudDebounce=null,cloudNeedsRerun=false,localMutationSeq=0;
@@ -157,17 +171,25 @@ function save(){
 async function flush(){await saveQueue;}
 function safeGetAccounts(){try{const a=JSON.parse(localStorage.getItem(STORE)||'[]');return Array.isArray(a)?a:[];}catch{return [];}}
 function allExercises(){return [...EXERCISES,...(data?.customExercises||[])];}
-function getEx(id){return allExercises().find(e=>e.id===id)||{id,name:'Unbekannte Übung',group:'Andere',equipment:'',art:'chest'};}
+function getEx(id){return allExercises().find(e=>e.id===id)||{id,name:'Unbekannte Übung',group:'Andere',equipment:'',art:'chest',mode:'strength'};}
+function isCardioExercise(exOrId){const id=typeof exOrId==='string'?exOrId:exOrId?.id;return getEx(id).mode==='cardio';}
+function cardioShape(e){if(!e.cardio)e.cardio={duration:'',distance:'',calories:'',recordedAt:null};return e.cardio;}
+function cardioValid(e){const c=e?.cardio||{};return ['duration','distance','calories'].some(k=>c[k]!==''&&c[k]!=null&&Number(c[k])>0);}
+function entryCompleted(e){return isCardioExercise(e)?cardioValid(e):e.sets.some(validSet);}
+function cardioDuration(e){return Number(e?.cardio?.duration)||0;}
+function cardioDistance(e){return Number(e?.cardio?.distance)||0;}
+function cardioCalories(e){return Number(e?.cardio?.calories)||0;}
 function validSet(s){return s.reps!==''&&s.kg!==''&&s.reps!=null&&s.kg!=null&&Number.isFinite(Number(s.reps))&&Number.isFinite(Number(s.kg))&&Number(s.reps)>0&&Number(s.kg)>=0;}
 const exVolume = e=>e.sets.reduce((n,s)=>n+(validSet(s)?Number(s.kg)*Number(s.reps):0),0);
 const exPeak = e=>Math.max(0,...e.sets.filter(validSet).map(s=>Number(s.kg)));
 const exSetCount = e=>e.sets.filter(validSet).length;
 function session(){return data?.sessions.find(s=>s.date===selectedDate)||null;}
 function ensureSession(){let s=session();if(s)return s;s={id:uid(),date:selectedDate,createdAt:new Date().toISOString(),updatedAt:new Date().toISOString(),planId:null,planName:'Freies Training',exercises:[]};data.sessions.push(s);return s;}
-function addExerciseToSession(id){const s=ensureSession();if(s.exercises.some(e=>e.id===id))return false;s.exercises.push({id,sets:[{id:uid(),kg:'',reps:''},{id:uid(),kg:'',reps:''},{id:uid(),kg:'',reps:''}]});s.updatedAt=new Date().toISOString();save();return true;}
-function priorExercise(id){return data.sessions.filter(s=>s.date<selectedDate).sort((a,b)=>b.date.localeCompare(a.date)).map(s=>({date:s.date,ex:s.exercises.find(e=>e.id===id)})).find(x=>x.ex&&x.ex.sets.some(validSet))||null;}
+function makeExerciseEntry(id){return isCardioExercise(id)?{id,sets:[],cardio:{duration:'',distance:'',calories:'',recordedAt:null}}:{id,sets:[{id:uid(),kg:'',reps:''},{id:uid(),kg:'',reps:''},{id:uid(),kg:'',reps:''}]};}
+function addExerciseToSession(id){const s=ensureSession();if(s.exercises.some(e=>e.id===id))return false;s.exercises.push(makeExerciseEntry(id));s.updatedAt=new Date().toISOString();save();return true;}
+function priorExercise(id){return data.sessions.filter(s=>s.date<selectedDate).sort((a,b)=>b.date.localeCompare(a.date)).map(s=>({date:s.date,ex:s.exercises.find(e=>e.id===id)})).find(x=>x.ex&&entryCompleted(x.ex))||null;}
 // Historische Sätze sind NUR Vorlagen. Bis zur manuellen Übernahme zählen sie nicht als Training.
-function previousValidSets(id){return priorExercise(id)?.ex.sets.filter(validSet)||[];}
+function previousValidSets(id){return isCardioExercise(id)?[]:(priorExercise(id)?.ex.sets.filter(validSet)||[]);}
 function hasSetField(v){return v!==''&&v!=null;}
 function applyPreviousSet(target, source, field=null){
  if(!target||!source||!validSet(source))return false;
@@ -184,8 +206,10 @@ function applyPreviousSet(target, source, field=null){
 }
 function commitPriorChange(){const s=session();if(!s)return;s.updatedAt=new Date().toISOString();save();const unlocked=maybeUnlockBooster(s);render();if(!unlocked)syncBoosterStatus();}
 
-function exerciseEntries(id){return data.sessions.flatMap(s=>s.exercises.filter(e=>e.id===id&&e.sets.some(validSet)).map(ex=>({date:s.date,volume:exVolume(ex),peak:exPeak(ex),count:exSetCount(ex),ex})) ).sort((a,b)=>a.date.localeCompare(b.date));}
-const allEntries=()=>data.sessions.flatMap(s=>s.exercises.filter(e=>e.sets.some(validSet)).map(e=>({date:s.date,ex:e})));
+function exerciseEntries(id){return data.sessions.flatMap(s=>s.exercises.filter(e=>e.id===id&&entryCompleted(e)).map(ex=>({date:s.date,volume:exVolume(ex),peak:exPeak(ex),count:exSetCount(ex),ex,duration:cardioDuration(ex),distance:cardioDistance(ex),calories:cardioCalories(ex)})) ).sort((a,b)=>a.date.localeCompare(b.date));}
+const allEntries=()=>data.sessions.flatMap(s=>s.exercises.filter(entryCompleted).map(e=>({date:s.date,ex:e})));
+const allCardioEntries=()=>data.sessions.flatMap(s=>s.exercises.filter(e=>isCardioExercise(e)&&entryCompleted(e)).map(e=>({date:s.date,ex:e}))).sort((a,b)=>a.date.localeCompare(b.date));
+
 
 function normalizeDataShape(obj){
  if(!obj||typeof obj!=='object')obj=baseData();
@@ -194,47 +218,54 @@ function normalizeDataShape(obj){
  if(!Array.isArray(obj.sessions))obj.sessions=[];
  if(!Array.isArray(obj.inventory))obj.inventory=[];
  if(!Array.isArray(obj.equippedItems))obj.equippedItems=[];
- obj.version=2;
+ if(!Array.isArray(obj.gymLayout))obj.gymLayout=Array(10).fill(null);
+ if(!obj.gymDesign||typeof obj.gymDesign!=='object')obj.gymDesign={wall:'sand',floor:'walnut',scene:'courtyard'};
+ obj.gymLayout=(obj.gymLayout.concat(Array(10).fill(null))).slice(0,10);
+ if(obj.equippedItems.length)obj.equippedItems.slice(0,10).forEach((id,i)=>{if(!obj.gymLayout[i])obj.gymLayout[i]=id;});
+ obj.version=4;
  obj.sessions.forEach(s=>{
    if(!Array.isArray(s.exercises))s.exercises=[];
    if(typeof s.planId==='undefined')s.planId=null;
    if(!s.planName)s.planName='Freies Training';
-   s.exercises.forEach(ex=>{if(!Array.isArray(ex.sets)||!ex.sets.length)ex.sets=[{id:uid(),kg:'',reps:''}]});
+   s.exercises.forEach(ex=>{
+     if(isCardioExercise(ex.id)){
+       if(!ex.cardio)ex.cardio={duration:'',distance:'',calories:'',recordedAt:null};
+       if(!Array.isArray(ex.sets))ex.sets=[];
+     }else if(!Array.isArray(ex.sets)||!ex.sets.length)ex.sets=[{id:uid(),kg:'',reps:''}];
+   });
  });
  return obj;
 }
-function completedSessions(){return (data?.sessions||[]).filter(s=>s.exercises.some(e=>e.sets.some(validSet))).sort((a,b)=>a.date.localeCompare(b.date));}
-function sessionProgress(s){const total=s?.exercises?.length||0,completed=(s?.exercises||[]).filter(e=>e.sets.some(validSet)).length;return {total,completed,done:total>0&&completed===total};}
-function boosterItem(id){return BOOSTER_ITEMS.find(x=>x.id===id)||{id,name:id,category:'Fund',icon:'🎁',rarity:'common'};}
+function completedSessions(){return (data?.sessions||[]).filter(s=>s.exercises.some(entryCompleted)).sort((a,b)=>a.date.localeCompare(b.date));}
+function sessionProgress(s){const total=s?.exercises?.length||0,completed=(s?.exercises||[]).filter(entryCompleted).length;return {total,completed,done:total>0&&completed===total};}
+function boosterItem(id){return BOOSTER_ITEMS.find(x=>x.id===id)||{id,name:id,category:'Fund',code:'IT',rarity:'common'};}
 function uniqueInventoryIds(){return [...new Set(data?.inventory||[])];}
 function collectionCount(id){return (data?.inventory||[]).filter(x=>x===id).length;}
-function drawBoosterItems(n=3){
+function drawBoosterItems(n=1){
  const picks=[];
  while(picks.length<n){
    const roll=Math.random()*100;
-   const rarity=roll<60?'common':roll<90?'rare':'epic';
+   const rarity=roll<68?'common':roll<92?'rare':'epic';
    const pool=BOOSTER_ITEMS.filter(x=>x.rarity===rarity);
-   const item=pool[Math.floor(Math.random()*pool.length)]||BOOSTER_ITEMS[Math.floor(Math.random()*BOOSTER_ITEMS.length)];
-   picks.push(item);
+   picks.push((pool[Math.floor(Math.random()*pool.length)]||BOOSTER_ITEMS[0]));
  }
  return picks;
 }
-function autoEquipItems(ids){
- if(!Array.isArray(data.equippedItems))data.equippedItems=[];
- ids.forEach(id=>{if(data.equippedItems.length<4&&!data.equippedItems.includes(id))data.equippedItems.push(id);});
-}
+function placedItemIds(){return (data?.gymLayout||[]).filter(Boolean);}
+function placeItemInGym(id){data.gymLayout=data.gymLayout||Array(10).fill(null);if(data.gymLayout.includes(id))return true;const slot=data.gymLayout.findIndex(x=>!x);if(slot<0)return false;data.gymLayout[slot]=id;return true;}
+function removePlacedItemFromGym(id){data.gymLayout=(data.gymLayout||Array(10).fill(null)).map(x=>x===id?null:x);}
 function maybeUnlockBooster(s=session()){
  if(!s)return false;
  const prog=sessionProgress(s);
  if(!prog.done||s.boosterPack?.items?.length)return false;
- const items=drawBoosterItems(3).map(x=>x.id);
+ const items=drawBoosterItems(1).map(x=>x.id);
  s.boosterPack={date:s.date,items,openedAt:new Date().toISOString()};
  data.inventory.push(...items);
- autoEquipItems(items);
+ placeItemInGym(items[0]);
  s.updatedAt=new Date().toISOString();
  save();
  modal={type:'booster',date:s.date,itemIds:items};
- toast('Booster-Pack freigeschaltet!');
+ toast('Booster-Pack freigeschaltet');
  return true;
 }
 function startOfWeek(dateStr=localDate()){
@@ -248,90 +279,79 @@ function trainingStreak(){
  const dates=[...new Set(completedSessions().map(s=>s.date))].sort((a,b)=>b.localeCompare(a));
  if(!dates.length)return 0;
  let streak=0,expect=localDate();
- for(const date of dates){
-   if(date===expect){streak++;expect=dateShift(expect,-1);}
-   else if(date<expect){break;}
- }
+ for(const date of dates){if(date===expect){streak++;expect=dateShift(expect,-1);}else if(date<expect)break;}
  return streak;
 }
 function personalRecordHits(){
- const bestPeak={},bestVolume={};
+ const bestPeak={},bestVolume={},bestDistance={},bestDuration={};
  let hits=0;
- completedSessions().forEach(s=>{
-   s.exercises.forEach(ex=>{
-     if(!ex.sets.some(validSet))return;
+ completedSessions().forEach(s=>s.exercises.forEach(ex=>{
+   if(!entryCompleted(ex))return;
+   let got=false;
+   if(isCardioExercise(ex)){
+     const dist=cardioDistance(ex),dur=cardioDuration(ex);
+     if(dist>(bestDistance[ex.id]??-1)){bestDistance[ex.id]=dist;got=true;}
+     if(dur>(bestDuration[ex.id]??-1)){bestDuration[ex.id]=dur;got=true;}
+   }else{
      const peak=exPeak(ex),vol=exVolume(ex);
-     let got=false;
      if(peak>(bestPeak[ex.id]??-1)){bestPeak[ex.id]=peak;got=true;}
      if(vol>(bestVolume[ex.id]??-1)){bestVolume[ex.id]=vol;got=true;}
-     if(got)hits++;
-   });
- });
+   }
+   if(got)hits++;
+ }));
  return hits;
 }
-function levelTitle(level){
- if(level>=20)return 'Gym-Architekt';
- if(level>=15)return 'Elite Builder';
- if(level>=10)return 'Studio-Master';
- if(level>=5)return 'Aufsteiger';
- return 'Starter';
-}
+function levelTitle(level){if(level>=20)return 'Studio Architect';if(level>=15)return 'Signature Builder';if(level>=10)return 'Progress Master';if(level>=5)return 'Momentum';return 'Start';}
 function gamificationStats(){
- const sessions=completedSessions();
- const entries=allEntries();
+ const sessions=completedSessions(),entries=allEntries();
  const totalSessions=sessions.length;
- const totalSets=entries.reduce((n,x)=>n+exSetCount(x.ex),0);
- const totalVolume=entries.reduce((n,x)=>n+exVolume(x.ex),0);
+ const totalSets=entries.reduce((n,x)=>n+(isCardioExercise(x.ex)?0:exSetCount(x.ex)),0);
+ const totalVolume=entries.reduce((n,x)=>n+(isCardioExercise(x.ex)?0:exVolume(x.ex)),0);
+ const totalCardioMinutes=entries.reduce((n,x)=>n+cardioDuration(x.ex),0);
+ const totalCardioDistance=entries.reduce((n,x)=>n+cardioDistance(x.ex),0);
+ const totalCardioCalories=entries.reduce((n,x)=>n+cardioCalories(x.ex),0);
  const recordHits=personalRecordHits();
  const boosterCount=sessions.filter(s=>s.boosterPack?.items?.length).length;
  const uniqueItems=uniqueInventoryIds().length;
  const weekStart=startOfWeek(localDate()),weekEnd=endOfWeek(localDate());
  const weekSessions=sessions.filter(s=>s.date>=weekStart&&s.date<=weekEnd);
- const weekSets=weekSessions.reduce((n,s)=>n+s.exercises.reduce((m,e)=>m+exSetCount(e),0),0);
- const weekBoosters=weekSessions.filter(s=>s.boosterPack?.items?.length).length;
- const xp=totalSessions*100+totalSets*2+recordHits*30+boosterCount*40+uniqueItems*15;
- const level=Math.max(1,Math.floor(xp/300)+1);
- const currentBase=(level-1)*300;
- const nextBase=level*300;
- const levelProgress=xp-currentBase;
- const levelGoal=nextBase-currentBase;
+ const weekSets=weekSessions.reduce((n,s)=>n+s.exercises.reduce((m,e)=>m+(isCardioExercise(e)?0:exSetCount(e)),0),0);
+ const weekCardio=weekSessions.reduce((n,s)=>n+s.exercises.reduce((m,e)=>m+cardioDuration(e),0),0);
+ const xp=Math.round(totalSessions*90+totalSets*2+totalCardioMinutes*1.5+recordHits*30+boosterCount*40+uniqueItems*12);
+ const level=Math.max(1,Math.floor(xp/320)+1),currentBase=(level-1)*320,nextBase=level*320;
  const badges=[
-   {name:'Erste Session',earned:totalSessions>=1,icon:'✅'},
-   {name:'5 Workouts',earned:totalSessions>=5,icon:'🔥'},
-   {name:'10.000 kg Volumen',earned:totalVolume>=10000,icon:'🏋️'},
-   {name:'Sammler',earned:uniqueItems>=10,icon:'🎁'},
-   {name:'PR-Jäger',earned:recordHits>=10,icon:'🏆'}
+   {name:'Start abgeschlossen',earned:totalSessions>=1,code:'S1'},
+   {name:'5 Workouts',earned:totalSessions>=5,code:'W5'},
+   {name:'10.000 kg Volumen',earned:totalVolume>=10000,code:'V10'},
+   {name:'Cardio 100 Min',earned:totalCardioMinutes>=100,code:'C100'},
+   {name:'20 Collectibles',earned:uniqueItems>=20,code:'G20'}
  ];
  const missions=[
    {label:'3 Trainingseinheiten diese Woche',current:weekSessions.length,target:3},
-   {label:'12 Sätze diese Woche',current:weekSets,target:12},
-   {label:'1 Booster-Pack diese Woche',current:weekBoosters,target:1}
+   {label:'12 Kraft-Sätze diese Woche',current:weekSets,target:12},
+   {label:'60 Cardio-Minuten diese Woche',current:weekCardio,target:60}
  ];
- return {totalSessions,totalSets,totalVolume,recordHits,boosterCount,uniqueItems,xp,level,levelTitle:levelTitle(level),levelProgress,levelGoal,streak:trainingStreak(),missions,badges};
+ return {totalSessions,totalSets,totalVolume,totalCardioMinutes,totalCardioDistance,totalCardioCalories,recordHits,boosterCount,uniqueItems,xp,level,levelTitle:levelTitle(level),levelProgress:xp-currentBase,levelGoal:nextBase-currentBase,streak:trainingStreak(),missions,badges};
 }
-function renderBoosterItems(itemIds){
- return `<div class="booster-items">${itemIds.map(id=>{const item=boosterItem(id);return `<div class="loot-card rarity-${item.rarity}"><div class="loot-icon">${item.icon}</div><strong>${escapeHTML(item.name)}</strong><small>${escapeHTML(item.category)} · ${RARITY_LABELS[item.rarity]}</small></div>`;}).join('')}</div>`;
-}
+function itemBadge(item){return `<span class="item-badge item-${item.rarity}">${escapeHTML(item.code||'IT')}</span>`;}
+function renderBoosterItems(itemIds){return `<div class="booster-items">${itemIds.map(id=>{const item=boosterItem(id);return `<div class="loot-card rarity-${item.rarity}">${itemBadge(item)}<strong>${escapeHTML(item.name)}</strong><small>${escapeHTML(item.category.trim())} · ${RARITY_LABELS[item.rarity]}</small></div>`;}).join('')}</div>`;}
 function renderBoosterStatus(s){
- if(!s||!s.exercises.length)return `<div class="card booster-status"><div class="row between"><div><strong>Booster-Pack</strong><p class="intro">Wähle einen Plan oder füge Übungen hinzu. Sobald jede geplante Übung mindestens einen Satz hat, schaltest du ein Booster-Pack für dein Mini-Gym frei.</p></div><span class="status-chip">0/0</span></div></div>`;
+ if(!s||!s.exercises.length)return `<div class="card booster-status"><div class="row between"><div><strong>Booster-Pack</strong><p class="intro">Wähle einen Plan oder füge Übungen hinzu. Sobald jede geplante Übung mindestens einen Eintrag hat, schaltest du ein Pack mit genau einem neuen Objekt frei.</p></div><span class="status-chip">0/0</span></div></div>`;
  const prog=sessionProgress(s),pct=prog.total?Math.round(prog.completed/prog.total*100):0;
- if(s.boosterPack?.items?.length)return `<div class="card booster-status unlocked"><div class="row between"><div><strong>Booster-Pack freigeschaltet</strong><p class="intro">Alle geplanten Übungen sind erfasst. Dein Pack ist bereit.</p></div><span class="status-chip">${prog.completed}/${prog.total}</span></div><div class="progress-bar"><span id="booster-progress-fill" style="width:100%"></span></div><div class="btn-wrap" style="margin-top:12px"><button class="btn btn-primary" data-action="open-session-booster">🎁 Booster ansehen</button><button class="btn btn-ghost" data-action="booster-to-stats">Mini-Gym öffnen</button></div></div>`;
- return `<div class="card booster-status"><div class="row between"><div><strong>Booster-Pack</strong><p class="intro">Sobald alle geplanten Übungen mindestens einen eingetragenen Satz haben, wird automatisch ein Booster-Pack freigeschaltet.</p></div><span class="status-chip" id="booster-count">${prog.completed}/${prog.total}</span></div><div class="progress-bar"><span id="booster-progress-fill" style="width:${pct}%"></span></div><div class="small muted" id="booster-note">${prog.completed} von ${prog.total} Übungen abgehakt</div></div>`;
+ if(s.boosterPack?.items?.length)return `<div class="card booster-status unlocked"><div class="row between"><div><strong>Booster-Pack freigeschaltet</strong><p class="intro">Dein Training für ${shortDate(s.date)} ist vollständig. Ein neues Objekt wartet auf dich.</p></div><span class="status-chip">${prog.completed}/${prog.total}</span></div><div class="progress-bar"><span id="booster-progress-fill" style="width:100%"></span></div><div class="btn-wrap" style="margin-top:12px"><button class="btn btn-primary" data-action="open-session-booster">Pack öffnen</button><button class="btn btn-ghost" data-action="booster-to-stats">Mini-Gym öffnen</button></div></div>`;
+ return `<div class="card booster-status"><div class="row between"><div><strong>Booster-Pack</strong><p class="intro">Jede geplante Übung oder Cardio-Einheit muss für diesen Tag mindestens einmal erfasst sein.</p></div><span class="status-chip" id="booster-count">${prog.completed}/${prog.total}</span></div><div class="progress-bar"><span id="booster-progress-fill" style="width:${pct}%"></span></div><div class="small muted" id="booster-note">${prog.completed} von ${prog.total} Einträgen vollständig</div></div>`;
 }
 function renderMiniGym(){
- const equipped=(data.equippedItems||[]).map(boosterItem);
+ data.gymLayout=(data.gymLayout||Array(10).fill(null)).slice(0,10);
+ const wall=data.gymDesign?.wall||'sand',floor=data.gymDesign?.floor||'walnut',scene=data.gymDesign?.scene||'courtyard';
+ const wallOptions=[['sand','Sand'],['travertine','Travertin'],['clay','Clay'],['graphite','Graphit']];
+ const floorOptions=[['walnut','Walnut'],['oak','Oak'],['stone','Stone'],['cream','Cream']];
+ const sceneOptions=[['courtyard','Innenhof'],['studio','Studio'],['terrace','Terrasse']];
  const unlocked=uniqueInventoryIds();
- return `<div class="card"><div class="mini-gym-room">${equipped.length?equipped.map(item=>`<div class="mini-gym-slot rarity-${item.rarity}"><span>${item.icon}</span><strong>${escapeHTML(item.name)}</strong><small>${escapeHTML(item.category)}</small></div>`).join(''):`<div class="empty" style="width:100%"><strong>Noch leer</strong><p>Öffne dein erstes Booster-Pack, um dein Mini-Gym auszustatten.</p></div>`}</div><p class="intro" style="margin-bottom:12px">Du kannst bis zu vier Lieblingsstücke gleichzeitig platzieren. Tippe unten auf einen Fund, um ihn ein- oder auszublenden.</p><div class="collection-grid">${unlocked.map(id=>{const item=boosterItem(id),equippedNow=(data.equippedItems||[]).includes(id);return `<button class="collection-item rarity-${item.rarity} ${equippedNow?'equipped':''}" data-action="toggle-equip-item" data-item="${escapeHTML(id)}"><span class="collection-emoji">${item.icon}</span><span class="grow"><strong>${escapeHTML(item.name)}</strong><small>${escapeHTML(item.category)} · ${collectionCount(id)}x</small></span><span class="tiny">${equippedNow?'Platziert':'Platzieren'}</span></button>`;}).join('')||'<div class="empty"><p>Noch keine Gegenstände gesammelt.</p></div>'}</div></div>`;
+ return `<div class="card"><div class="row between" style="margin-bottom:10px"><div><strong>Mini-Gym Studio</strong><div class="small muted">Bis zu 10 Objekte platzierbar · Wand, Boden und Szene anpassbar</div></div><span class="status-chip">${placedItemIds().length}/10 platziert</span></div><div class="mini-gym-canvas wall-${wall} floor-${floor} scene-${scene}"><div class="mini-gym-upper"></div><div class="mini-gym-lower"></div><div class="mini-gym-outdoor"></div>${data.gymLayout.map((id,i)=>{const item=id?boosterItem(id):null;return `<button class="mini-slot pos-${i+1} ${item?`rarity-${item.rarity}`:'empty-slot'}" data-action="clear-slot" data-slot="${i}" title="${item?escapeHTML(item.name):'Freier Platz'}">${item?`${itemBadge(item)}<small>${escapeHTML(item.name)}</small>`:`<span class="slot-label">Slot ${i+1}</span>`}</button>`;}).join('')}</div><div class="stack" style="margin-top:14px"><div><div class="small muted" style="margin-bottom:8px">Wand</div><div class="filters">${wallOptions.map(([id,label])=>`<button class="chip ${wall===id?'active':''}" data-action="set-wall" data-value="${id}">${label}</button>`).join('')}</div></div><div><div class="small muted" style="margin-bottom:8px">Boden</div><div class="filters">${floorOptions.map(([id,label])=>`<button class="chip ${floor===id?'active':''}" data-action="set-floor" data-value="${id}">${label}</button>`).join('')}</div></div><div><div class="small muted" style="margin-bottom:8px">Szene</div><div class="filters">${sceneOptions.map(([id,label])=>`<button class="chip ${scene===id?'active':''}" data-action="set-scene" data-value="${id}">${label}</button>`).join('')}</div></div></div><div class="section-header"><h3>Sammlung</h3><span class="subtitle">${unlocked.length} / 100 freigeschaltet</span></div><div class="collection-grid">${unlocked.map(id=>{const item=boosterItem(id),placed=(data.gymLayout||[]).includes(id);return `<button class="collection-item rarity-${item.rarity} ${placed?'equipped':''}" data-action="place-item" data-item="${escapeHTML(id)}">${itemBadge(item)}<span class="grow"><strong>${escapeHTML(item.name)}</strong><small>${escapeHTML(item.category.trim())} · ${collectionCount(id)}×</small></span><span class="tiny">${placed?'Platziert':'Platzieren'}</span></button>`;}).join('')||'<div class="empty"><p>Noch keine Gegenstände gesammelt.</p></div>'}</div></div>`;
 }
-function syncBoosterStatus(){
- const s=session();
- const chip=el('booster-count'),bar=el('booster-progress-fill'),note=el('booster-note');
- if(!s||!chip||!bar||!note)return;
- const prog=sessionProgress(s),pct=prog.total?Math.round(prog.completed/prog.total*100):0;
- chip.textContent=`${prog.completed}/${prog.total}`;
- bar.style.width=`${pct}%`;
- note.textContent=`${prog.completed} von ${prog.total} Übungen abgehakt`;
-}
+function syncBoosterStatus(){const s=session(),chip=el('booster-count'),bar=el('booster-progress-fill'),note=el('booster-note');if(!s||!chip||!bar||!note)return;const prog=sessionProgress(s),pct=prog.total?Math.round(prog.completed/prog.total*100):0;chip.textContent=`${prog.completed}/${prog.total}`;bar.style.width=`${pct}%`;note.textContent=`${prog.completed} von ${prog.total} Einträgen vollständig`;}
+
 function loadTimerState(){
  try{
    const raw=JSON.parse(localStorage.getItem(TIMER_STORE)||'null');
@@ -357,7 +377,7 @@ function startPauseTimer(){ensureTimerReady(); if(timerState.running){timerState
 function resetTimer(){timerState.running=false;timerState.endAt=null;timerState.remainingMs=timerCurrentDuration();timerState.flashUntil=0;saveTimerState();updateTimerUI();}
 function setSinglePreset(sec){timerState.single=sec;if(timerState.mode!=='cycle'){timerState.remainingMs=sec*1000;if(!timerState.running)timerState.endAt=null;}saveTimerState();updateTimerUI();}
 function toggleTimerMode(enabled){timerState.mode=enabled?'cycle':'single';timerState.active='A';timerState.running=false;timerState.endAt=null;timerState.remainingMs=timerCurrentDuration();saveTimerState();updateTimerUI();render();}
-function renderTimerDock(){const remaining=formatTimer(timerRemainingMs());return `<div class="timer-dock ${timerState.expanded?'open':''} ${Date.now()<(timerState.flashUntil||0)?'done':''}" id="timer-dock"><button class="timer-toggle" data-action="toggle-timer-panel" id="timer-mini"><span>⏱</span><strong>${remaining}</strong></button><div class="timer-panel"><div class="row between"><div><strong>Pausen-Timer</strong><div class="small muted" id="timer-meta">${timerState.mode==='cycle'?`Zirkel ${timerState.cycleA}s ↔ ${timerState.cycleB}s`:`${timerState.single}s Standard`}</div></div><button class="btn btn-small btn-ghost" data-action="toggle-timer-panel">×</button></div><div class="timer-big" id="timer-big">${remaining}</div><div class="timer-presets">${TIMER_PRESETS.map(sec=>`<button class="chip ${(timerState.mode==='single'&&timerState.single===sec)?'active':''}" data-action="timer-preset" data-seconds="${sec}">${sec}s</button>`).join('')}</div><label class="timer-check"><input type="checkbox" id="timer-cycle-enabled" ${timerState.mode==='cycle'?'checked':''}> Zirkelmodus</label><div class="timer-cycle-row"><select class="input" id="timer-cycle-a">${TIMER_PRESETS.map(sec=>`<option value="${sec}" ${timerState.cycleA===sec?'selected':''}>${sec} s</option>`).join('')}</select><span>↔</span><select class="input" id="timer-cycle-b">${TIMER_PRESETS.map(sec=>`<option value="${sec}" ${timerState.cycleB===sec?'selected':''}>${sec} s</option>`).join('')}</select></div><div class="btn-wrap"><button class="btn btn-primary grow" data-action="timer-startpause">${timerState.running?'Pause':'Start'}</button><button class="btn grow" data-action="timer-reset">Reset</button></div></div></div>`;}
+function renderTimerDock(){const remaining=formatTimer(timerRemainingMs());return `<div class="timer-dock ${timerState.expanded?'open':''} ${Date.now()<(timerState.flashUntil||0)?'done':''}" id="timer-dock"><button class="timer-toggle" data-action="toggle-timer-panel" id="timer-mini"><span>TIMER</span><strong>${remaining}</strong></button><div class="timer-panel"><div class="row between"><div><strong>Pausen-Timer</strong><div class="small muted" id="timer-meta">${timerState.mode==='cycle'?`Zirkel ${timerState.cycleA}s ↔ ${timerState.cycleB}s`:`${timerState.single}s Standard`}</div></div><button class="btn btn-small btn-ghost" data-action="toggle-timer-panel">×</button></div><div class="timer-big" id="timer-big">${remaining}</div><div class="timer-presets">${TIMER_PRESETS.map(sec=>`<button class="chip ${(timerState.mode==='single'&&timerState.single===sec)?'active':''}" data-action="timer-preset" data-seconds="${sec}">${sec}s</button>`).join('')}</div><label class="timer-check"><input type="checkbox" id="timer-cycle-enabled" ${timerState.mode==='cycle'?'checked':''}> Zirkelmodus</label><div class="timer-cycle-row"><select class="input" id="timer-cycle-a">${TIMER_PRESETS.map(sec=>`<option value="${sec}" ${timerState.cycleA===sec?'selected':''}>${sec} s</option>`).join('')}</select><span>↔</span><select class="input" id="timer-cycle-b">${TIMER_PRESETS.map(sec=>`<option value="${sec}" ${timerState.cycleB===sec?'selected':''}>${sec} s</option>`).join('')}</select></div><div class="btn-wrap"><button class="btn btn-primary grow" data-action="timer-startpause">${timerState.running?'Pause':'Start'}</button><button class="btn grow" data-action="timer-reset">Reset</button></div></div></div>`;}
 function updateTimerUI(){
  const dock=el('timer-dock'); if(!dock)return;
  const remaining=formatTimer(timerRemainingMs());
@@ -371,7 +391,7 @@ function updateTimerUI(){
 
 /* Die Übungsbilder sind eigenständig gezeichnete schematische SVG-Illustrationen. */
 function art(type){
- const H='#cbed9a',M='#80a8b4',G='#4f7280';
+ const H='#d8b08c',M='#9a7a62',G='#6b5649';
  const line=(path,c=H,w=5)=>`<path d="${path}" fill="none" stroke="${c}" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round"/>`;
  const dot=(x,y,r=8)=>`<circle cx="${x}" cy="${y}" r="${r}" fill="${H}"/>`;
  const bar=(x,y,w,h=4,c=M)=>`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="2" fill="${c}"/>`;
@@ -397,7 +417,7 @@ function art(type){
   case 'cable':z=dot(89,34)+line('M89 44V77 M89 50L108 61L124 48 M89 50L70 62L55 54 M89 77L72 98 M89 77L107 98')+line('M27 19V103 M25 19H52 M25 39L53 55',M,4)+bar(20,70,13,24,G)+bar(117,41,11,14);break;
   default:z=dot(83,35)+line('M83 45V79 M83 49L60 70 M83 49L105 70 M83 79L67 98 M83 79L101 98');
  }
- return `<svg viewBox="0 0 170 120" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Schematische Übungsillustration" focusable="false"><defs><linearGradient id="b${type}" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#29424a"/><stop offset="1" stop-color="#172a33"/></linearGradient></defs><rect width="170" height="120" rx="11" fill="url(#b${type})"/><circle cx="139" cy="21" r="57" fill="#bedb93" opacity=".045"/><path d="M13 104H157" stroke="#4e6b6e" stroke-width="1" stroke-dasharray="5 5"/>${z}</svg>`;
+ return `<svg viewBox="0 0 170 120" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Schematische Übungsillustration" focusable="false"><defs><linearGradient id="b${type}" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#5b4334"/><stop offset="1" stop-color="#2e221b"/></linearGradient></defs><rect width="170" height="120" rx="11" fill="url(#b${type})"/><circle cx="139" cy="21" r="57" fill="#f5dcc5" opacity=".06"/><path d="M13 104H157" stroke="#7e6756" stroke-width="1" stroke-dasharray="5 5"/>${z}</svg>`;
 }
 function artBox(ex,small=false){return `<div class="ex-art ${small?'mini':''}">${art(ex.art)}</div>`;}
 function svgIcon(name){const paths={home:'<path d="m3 10 9-7 9 7v10H3z"/><path d="M9 20v-7h6v7"/>',exercise:'<path d="M5 8v8M8 6v12M16 6v12M19 8v8M8 12h8"/>',plans:'<rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 9h8M8 13h8M8 17h5"/>',stats:'<path d="M4 20V4M4 20h17M7 16l4-5 3 2 6-8"/>',user:'<circle cx="12" cy="8" r="4"/><path d="M4 20c0-5 3-7 8-7s8 2 8 7"/>'};return `<svg viewBox="0 0 24 24" aria-hidden="true">${paths[name]||paths.home}</svg>`;}
@@ -424,54 +444,73 @@ function cloudForms(){
 function renderAuth(){const newMode=authMode==='new'||!accounts.length;return `<main class="auth-layout"><div class="brand"><div class="mark">K</div><div><h1 style="font-size:19px;margin:0;letter-spacing:1px">KRAFTLOG</h1><small>DEIN TRAINING. DEINE DATEN.</small></div></div><h1>Stärker. Satz für Satz.</h1><p class="muted">Trainingspläne, Gewichte und Fortschritte – lokal verschlüsselt, auf Wunsch mit kostenloser Cloud-Synchronisierung.</p><section class="card auth-card"><h2>${newMode?'Dein privates Profil':'Profil entsperren'}</h2><p>${newMode?'Du legst ein verschlüsseltes Profil nur für dieses Gerät an.':'Deine Trainingsdaten sind auf diesem Gerät verschlüsselt gespeichert. Bei aktivierter Cloud werden sie zusätzlich online gesichert.'}</p><form id="auth-form" autocomplete="off">${newMode?`<div class="field"><label for="reg-name">Profilname</label><input required class="input" id="reg-name" name="name" maxlength="40" placeholder="z. B. Alex" autocomplete="nickname"></div>`:`<div class="field"><label for="login-profile">Profil auswählen</label><select class="input" id="login-profile" name="profile">${accounts.map(a=>`<option value="${escapeHTML(a.id)}">${escapeHTML(a.name)}</option>`).join('')}</select></div>`}<div class="field"><label for="auth-passwort">${newMode?'Passwort festlegen (mind. 8 Zeichen)':'Passwort'}</label><input required type="password" class="input" id="auth-passwort" name="password" minlength="8" autocomplete="${newMode?'new-password':'current-password'}" placeholder="Dein Passwort"></div>${newMode?`<div class="field"><label for="auth-confirm">Passwort wiederholen</label><input required type="password" class="input" id="auth-confirm" name="confirm" minlength="8" autocomplete="new-password" placeholder="Passwort wiederholen"></div>`:''}<button type="submit" class="btn btn-primary btn-block">${newMode?'Profil erstellen':'Profil öffnen'} →</button></form>${accounts.length?`<button type="button" class="btn btn-ghost btn-block" style="margin-top:10px" data-action="auth-mode">${newMode?'Vorhandenes Profil öffnen':'Neues Profil auf diesem Gerät erstellen'}</button>`:''}<button type="button" class="btn btn-ghost btn-block" style="margin-top:10px" data-action="import-backup">Verschlüsseltes Backup importieren</button><div class="auth-bubble">Dein Passwort verschlüsselt deine Trainingsdaten. Auch bei Cloud-Nutzung brauchst du es zum Entsperren. Ohne Cloud bleiben die Daten nur auf diesem Gerät.</div></section>${KraftlogCloud.enabled()?`<section class="card auth-card" style="margin-top:16px"><h2>Online-Profil wiederherstellen</h2><p>Neues Handy? Mit deinem Online-Konto den verschlüsselten Trainingsstand laden. Danach mit deinem bisherigen Profilpasswort entsperren.</p><form id="cloud-restore-form" class="stack"><div class="field"><label for="restore-email">E-Mail</label><input id="restore-email" name="email" class="input" type="email" required autocomplete="email"></div><div class="field"><label for="restore-password">Online-Passwort</label><input id="restore-password" name="password" class="input" type="password" minlength="8" required autocomplete="current-password"></div><button type="submit" class="btn btn-secondary btn-block">Online-Profil laden</button></form></section>`:''}<div class="auth-footer">Inoffizielles privates Trainingstagebuch · Kein Produkt von FitX</div></main>`;}
 function renderShell(){const tabs=[['today','Training','home'],['library','Übungen','exercise'],['plans','Pläne','plans'],['stats','Verlauf','stats'],['profile','Profil','user']];return `<main class="app-shell"><header class="header"><div class="brand"><div class="mark">K</div><div><h1>KRAFTLOG</h1><small>DEIN TRAINING. DEINE DATEN.</small></div></div><button class="profile-chip" data-action="switch-tab" data-tab="profile" aria-label="Profil öffnen"><span class="avatar">${escapeHTML((accounts.find(a=>a.id===currentId)?.name||'?').slice(0,1).toUpperCase())}</span><span class="truncate">${escapeHTML(accounts.find(a=>a.id===currentId)?.name)}</span></button></header>${activeTab==='today'?renderToday():activeTab==='library'?renderLibrary():activeTab==='plans'?renderPlans():activeTab==='stats'?renderStats():renderProfile()}<p class="footer-note">KRAFTLOG · privat & kostenlos · keine Verbindung zu FitX</p></main><nav class="bottomnav" aria-label="Hauptmenü">${tabs.map(([id,name,ico])=>`<button class="nav-button ${activeTab===id?'active':''}" data-action="switch-tab" data-tab="${id}" ${activeTab===id?'aria-current="page"':''}>${svgIcon(ico)}<span>${name}</span></button>`).join('')}</nav>${renderTimerDock()}`;}
 function renderDateBar(){return `<div class="card date-bar"><div class="date-label">${escapeHTML(longDate(selectedDate))}</div><button class="btn btn-small btn-icon" data-action="shift-date" data-days="-1" aria-label="Vorheriger Tag">‹</button><input class="input input-sm input-date" type="date" id="training-date" value="${selectedDate}" aria-label="Trainingstag wählen"><button class="btn btn-small btn-icon" data-action="shift-date" data-days="1" aria-label="Nächster Tag">›</button><button class="btn btn-small" data-action="today-date">Heute</button></div>`;}
-function renderToday(){const s=session();const entries=s?s.exercises:[],sets=entries.reduce((n,e)=>n+exSetCount(e),0),vol=entries.reduce((n,e)=>n+exVolume(e),0);return `<section class="hero"><span class="eyebrow">DEIN TRAININGSLOG</span><h2>Trainiere. Sammle. Gestalte.</h2><p>Erfasse deine Sätze, halte Pausen mit dem Timer ein und schalte nach vollständigen Workouts Booster-Packs für dein Mini-Gym frei.</p><div class="hero-footer"><span class="stat-pill"><strong>${entries.length}</strong> Übungen</span><span class="stat-pill"><strong id="day-set-count">${sets}</strong> erfasste Sätze</span><span class="stat-pill"><strong id="day-vol-total">${fmt(vol)} kg</strong> Volumen</span></div></section>${renderDateBar()}<div class="section-header"><h2>Dein Training</h2><span class="subtitle">${s?escapeHTML(s.planName)+(s.updatedAt?' · '+new Date(s.updatedAt).toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'}):''):'Noch nicht gestartet'}</span></div><div class="btn-wrap" style="margin-bottom:13px"><button class="btn btn-primary" data-action="open-plan-picker">▤ Trainingsplan auswählen</button><button class="btn" data-action="switch-tab" data-tab="library">＋ Übung hinzufügen</button></div>${renderBoosterStatus(s)}${entries.length?`<div class="stack" style="margin-top:12px">${entries.map(e=>renderSessionExercise(e)).join('')}</div>`:`<div class="empty"><span class="empty-icon">◎</span><strong>Noch keine Übungen für diesen Tag</strong><p>Wähle einen fertigen Plan oder füge einzelne Übungen hinzu. Du kannst alles jederzeit ändern.</p><button class="btn btn-secondary" data-action="open-plan-picker">Plan auswählen</button></div>`}${renderRecentDates()}`;}
-function renderRecentDates(){const dates=data.sessions.filter(s=>s.exercises.some(e=>e.sets.some(validSet))).sort((a,b)=>b.date.localeCompare(a.date)).slice(0,5);if(!dates.length)return '';return `<div class="section-header"><h3>Letzte Trainingstage</h3></div><div class="card stack">${dates.map(s=>`<button class="btn btn-ghost" style="justify-content:space-between" data-action="jump-date" data-date="${s.date}"><span>${shortDate(s.date)} · ${escapeHTML(s.planName||'Freies Training')}</span><span class="accent">${fmt(s.exercises.reduce((sum,e)=>sum+exVolume(e),0))} kg →</span></button>`).join('')}</div>`;}
-function renderSetRow(e,set,index,priorSets){
- const old=priorSets[index],done=validSet(set),name=escapeHTML(getEx(e.id).name);
- const copyField=(field,unit)=>old?`<button type="button" class="set-suggestion" data-action="copy-prior-field" data-ex="${escapeHTML(e.id)}" data-index="${index}" data-field="${field}" title="Letzten Wert einsetzen: ${fmt(old[field])} ${unit}" aria-label="${name}, Satz ${index+1}: ${fmt(old[field])} ${unit} vom letzten Training übernehmen">↳ ${fmt(old[field])} ${unit}</button>`:'<span class="set-no-suggestion" aria-hidden="true"></span>';
- return `<div class="set-row ${done?'set-row-done':''}" data-set-row="${escapeHTML(set.id)}">
- <span class="set-num">${index+1}</span>
- <div class="set-col"><label for="kg-${escapeHTML(set.id)}">GEWICHT (KG)</label><input id="kg-${escapeHTML(set.id)}" class="input input-sm ${old&&!hasSetField(set.kg)?'input-has-suggestion':''}" type="number" inputmode="decimal" min="0" max="9999" step="0.5" placeholder="${old?fmt(old.kg):'kg'}" data-set-field="kg" data-ex="${escapeHTML(e.id)}" data-set="${escapeHTML(set.id)}" value="${escapeHTML(set.kg)}" aria-label="Gewicht für Satz ${index+1}${old?'; zuletzt '+fmt(old.kg)+' kg':''}">${copyField('kg','kg')}</div>
- <div class="set-col"><label for="reps-${escapeHTML(set.id)}">WIEDERHOLUNGEN</label><input id="reps-${escapeHTML(set.id)}" class="input input-sm ${old&&!hasSetField(set.reps)?'input-has-suggestion':''}" type="number" inputmode="numeric" min="1" max="9999" step="1" placeholder="${old?fmt(old.reps):'Wdh.'}" data-set-field="reps" data-ex="${escapeHTML(e.id)}" data-set="${escapeHTML(set.id)}" value="${escapeHTML(set.reps)}" aria-label="Wiederholungen für Satz ${index+1}${old?'; zuletzt '+fmt(old.reps):''}">${copyField('reps','Wdh.')}</div>
- <div class="set-row-actions">${done?`<span class="set-done" title="Satz erfasst" aria-label="Satz ${index+1} erfasst">✓</span>`:old?`<button class="set-accept" type="button" data-action="copy-prior-set" data-ex="${escapeHTML(e.id)}" data-index="${index}" title="Fehlende Werte aus dem letzten Satz übernehmen" aria-label="Satz ${index+1} vom letzten Training übernehmen">✓</button>`:'<span class="set-action-spacer" aria-hidden="true"></span>'}<button class="btn btn-small btn-ghost set-remove" data-action="remove-set" data-ex="${escapeHTML(e.id)}" data-set="${escapeHTML(set.id)}" aria-label="Satz ${index+1} löschen" title="Satz löschen">×</button></div>
- </div>`;
-}
-function renderSessionExercise(e){
- const ex=getEx(e.id),previous=priorExercise(e.id),priorSets=previous?previous.ex.sets.filter(validSet):[],volume=exVolume(e),n=exSetCount(e);
- return `<article class="card exercise-card"><div class="ex-head">${artBox(ex)}<div class="ex-info"><h3>${escapeHTML(ex.name)}</h3><p>${escapeHTML(ex.group)} · ${escapeHTML(ex.equipment)}</p><p class="ex-date">${previous?'Letztes Training: '+shortDate(previous.date):'Noch kein früherer Eintrag'}</p></div><button class="btn btn-icon btn-small btn-ghost" aria-label="Übung entfernen" title="Übung entfernen" data-action="remove-ex" data-ex="${escapeHTML(ex.id)}">×</button></div><div class="ex-detail">
- ${previous?`<div class="ex-history"><strong>Zuletzt · ${shortDate(previous.date)}:</strong> ${priorSets.map(s=>`${fmt(s.kg)} kg × ${fmt(s.reps)}`).join(' · ')}<br><span>Volumen: ${fmt(exVolume(previous.ex))} kg</span></div><div class="prior-control"><p>Die grünen Zahlen sind Vorschläge. Erst beim Übernehmen oder eigenen Eintragen werden Sätze gespeichert.</p><button type="button" class="btn btn-secondary btn-small btn-block" data-action="copy-prior-all" data-ex="${escapeHTML(e.id)}">✓ Alle letzten Sätze übernehmen</button></div>`:''}
- <div class="sets-table">${e.sets.map((s,i)=>renderSetRow(e,s,i,priorSets)).join('')}</div>
- <div class="ex-foot"><button class="btn btn-small" data-action="add-set" data-ex="${escapeHTML(ex.id)}">＋ Satz hinzufügen</button><span class="small muted">Volumen: <strong class="vol" id="volume-${escapeHTML(ex.id)}">${fmt(volume)} kg</strong> · <span id="setcount-${escapeHTML(ex.id)}">${n}</span> Sätze</span></div></div></article>`;
-}
-function renderFilters(active){return `<div class="filters">${GROUPS.map(g=>`<button class="chip ${g===active?'active':''}" data-action="filter-group" data-group="${g}">${g}</button>`).join('')}</div>`;}
-function renderLibrary(){const s=session(),selected=new Set(s?.exercises.map(e=>e.id)||[]),exs=allExercises().filter(ex=>(libraryGroup==='Alle'||ex.group===libraryGroup)&&(ex.name+' '+ex.equipment).toLowerCase().includes(libraryQuery.toLowerCase()));return `<div class="section-header"><div><h2>Übungen</h2><div class="intro">Tippe auf „Hinzufügen“, um die Übung für ${shortDate(selectedDate)} zu verwenden.</div></div></div><div class="library-tools"><input class="input" id="library-search" value="${escapeHTML(libraryQuery)}" placeholder="Übung suchen, z. B. Latzug …" autocomplete="off">${renderFilters(libraryGroup)}</div><div class="exercise-grid" id="library-results">${exs.map(ex=>`<article class="library-card"><button class="library-art" type="button" data-action="exercise-info" data-ex="${escapeHTML(ex.id)}" aria-label="Bild und Erklärung: ${escapeHTML(ex.name)}">${art(ex.art)}</button><div><h3>${escapeHTML(ex.name)}</h3><p>${escapeHTML(ex.group)} · ${escapeHTML(ex.equipment)}</p></div><button class="btn btn-small ${selected.has(ex.id)?'btn-secondary':'btn-primary'} btn-block" data-action="toggle-exercise" data-ex="${escapeHTML(ex.id)}">${selected.has(ex.id)?'✓ Ausgewählt':'＋ Hinzufügen'}</button></article>`).join('')}</div>${!exs.length?`<div class="empty">Keine passende Übung gefunden.</div>`:''}<div class="section-header"><h3>Eigene Übung fehlt?</h3></div><button class="btn btn-ghost btn-block" data-action="new-exercise">＋ Eigene Übung anlegen</button><div class="notice">Die Bilder sind vereinfachte Zeichnungen zur Orientierung, keine offiziellen Gerätebilder von FitX. Prüfe am Gerät die tatsächliche Ausführung.</div>`;}
-function renderPlans(){return `<div class="section-header"><div><h2>Deine Trainingspläne</h2><p class="intro">Erstelle Pläne oder passe die Vorschläge an. Vor jedem Training kannst du Übungen an- und abwählen.</p></div></div><div class="stack">${data.plans.map(p=>`<article class="card plan-card"><div class="plan-art"></div><h3>${escapeHTML(p.name)}</h3><p>${p.exerciseIds.length} Übungen</p><div class="chiplist">${p.exerciseIds.slice(0,7).map(id=>`<span>${escapeHTML(getEx(id).name)}</span>`).join('')}${p.exerciseIds.length>7?`<span>+${p.exerciseIds.length-7}</span>`:''}</div><div class="btn-wrap"><button class="btn btn-primary btn-small" data-action="start-plan" data-plan="${p.id}">Für ${shortDate(selectedDate)} verwenden</button><button class="btn btn-small" data-action="edit-plan" data-plan="${p.id}">Bearbeiten</button></div></article>`).join('')}</div><button class="btn btn-secondary btn-block" style="margin-top:12px" data-action="edit-plan" data-plan="">＋ Eigenen Trainingsplan erstellen</button>`;}
-function plotChart(entries,metric){if(!entries.length)return `<div class="empty"><strong>Noch keine Daten</strong><p>Trage Sätze mit Gewicht und Wiederholungen ein, dann erscheint hier dein Fortschritt.</p></div>`;const pts=entries.slice(-14);const W=700,H=244,p={l:52,r:17,t:23,b:44};const vals=pts.map(x=>metric==='volume'?x.volume:x.peak);const max=Math.max(1,...vals);const yMax=Math.ceil(max/Math.pow(10,Math.floor(Math.log10(max)))*1.13)*Math.pow(10,Math.floor(Math.log10(max)));const xAt=i=>p.l+(pts.length===1?(W-p.l-p.r)/2:i*(W-p.l-p.r)/(pts.length-1));const yAt=v=>H-p.b-(v/yMax)*(H-p.t-p.b);const xy=pts.map((x,i)=>[xAt(i),yAt(vals[i])]);const grid=[0,.25,.5,.75,1].map(f=>`<line x1="${p.l}" y1="${yAt(yMax*f)}" x2="${W-p.r}" y2="${yAt(yMax*f)}" stroke="#32414a" stroke-dasharray="4 6"/><text x="${p.l-9}" y="${yAt(yMax*f)+4}" fill="#91a9b2" text-anchor="end" font-size="12">${fmt(yMax*f)}</text>`).join('');const path=xy.map((a,i)=>`${i?'L':'M'}${a[0].toFixed(1)} ${a[1].toFixed(1)}`).join(' ');const area=path+` L${xy.at(-1)[0]} ${H-p.b} L${xy[0][0]} ${H-p.b} Z`;const indices=[0,Math.floor((pts.length-1)/2),pts.length-1].filter((v,i,a)=>a.indexOf(v)===i);return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Verlaufsdiagramm für ${metric==='volume'?'Trainingsvolumen':'maximales Gewicht'}"><defs><linearGradient id="areafill" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#d3f971" stop-opacity=".24"/><stop offset="1" stop-color="#d3f971" stop-opacity="0"/></linearGradient></defs>${grid}<path d="${area}" fill="url(#areafill)"/><path d="${path}" fill="none" stroke="#d3f971" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>${xy.map((a,i)=>`<circle cx="${a[0]}" cy="${a[1]}" r="5" fill="#d3f971" stroke="#14231c" stroke-width="2"/><title>${shortDate(pts[i].date)}: ${fmt(vals[i])} kg</title>`).join('')}${indices.map(i=>`<text x="${xAt(i)}" y="${H-15}" fill="#9babb3" font-size="12" text-anchor="middle">${shortDate(pts[i].date).slice(0,5)}</text>`).join('')}</svg>`;}
-function renderStats(){const game=gamificationStats();const usedIds=new Set(allEntries().map(x=>x.ex.id));const exercises=allExercises().filter(e=>usedIds.has(e.id));if(exercises.length&&!usedIds.has(statExercise))statExercise=exercises[0].id;const entries=exerciseEntries(statExercise),last=entries.at(-1);return `<div class="section-header"><div><h2>Deine Statistik</h2><p class="intro">Fortschritt, XP, Booster und dein Mini-Gym auf einen Blick.</p></div></div><div class="card xp-card"><div class="row between" style="align-items:flex-start"><div><div class="eyebrow">LEVEL ${game.level}</div><h3 style="margin:6px 0 4px;font-size:28px">${escapeHTML(game.levelTitle)}</h3><div class="small muted">${game.xp} XP insgesamt · ${game.streak} Tage Serie</div></div><div class="xp-badge">${game.levelProgress} / ${game.levelGoal} XP</div></div><div class="progress-bar"><span style="width:${Math.min(100,Math.round(game.levelProgress/game.levelGoal*100))}%"></span></div><div class="stats-grid game-top-grid"><div class="metric-card"><strong>${game.totalSessions}</strong><small>Trainingstage</small></div><div class="metric-card"><strong>${game.recordHits}</strong><small>PR-Momente</small></div><div class="metric-card"><strong>${game.boosterCount}</strong><small>Booster geöffnet</small></div><div class="metric-card"><strong>${game.uniqueItems}</strong><small>Mini-Gym-Funde</small></div></div></div><div class="section-header"><h3>Wochenmissionen</h3></div><div class="mission-list">${game.missions.map(m=>`<div class="card mission-card"><div class="row between"><strong>${escapeHTML(m.label)}</strong><span class="small">${m.current}/${m.target}</span></div><div class="progress-bar small"><span style="width:${Math.min(100,Math.round(m.current/m.target*100))}%"></span></div></div>`).join('')}</div><div class="section-header"><h3>Badges</h3></div><div class="badge-grid">${game.badges.map(b=>`<div class="badge-card ${b.earned?'earned':''}"><span>${b.icon}</span><strong>${escapeHTML(b.name)}</strong><small>${b.earned?'Freigeschaltet':'Noch offen'}</small></div>`).join('')}</div><div class="section-header"><h3>Dein Mini-Gym</h3><span class="subtitle">${game.uniqueItems} einzigartige Gegenstände</span></div>${renderMiniGym()}<div class="section-header"><h3>Leistungsdaten</h3></div><div class="stats-grid"><div class="metric-card"><strong>${game.totalSessions}</strong><small>Trainingstage</small></div><div class="metric-card"><strong>${game.totalSets}</strong><small>Erfasste Sätze</small></div><div class="metric-card"><strong>${fmt(game.totalVolume)}</strong><small>Gesamtvolumen (kg)</small></div><div class="metric-card"><strong>${exercises.length}</strong><small>Trainierte Übungen</small></div></div>${exercises.length?`<div class="card"><div class="field"><label for="stat-exercise">Übung auswählen</label><select class="input" id="stat-exercise">${exercises.map(e=>`<option value="${e.id}" ${statExercise===e.id?'selected':''}>${escapeHTML(e.name)}</option>`).join('')}</select></div><div class="section-header"><h3>${escapeHTML(getEx(statExercise).name)}</h3><span class="subtitle">${entries.length} Einträge</span></div><div class="chart-switch"><button class="chip ${statMetric==='volume'?'active':''}" data-action="metric" data-metric="volume">Trainingsvolumen</button><button class="chip ${statMetric==='peak'?'active':''}" data-action="metric" data-metric="peak">Max. Gewicht</button></div><div class="chart-wrap">${plotChart(entries,statMetric)}</div>${last?`<p class="small muted">Zuletzt: ${shortDate(last.date)} · ${fmt(last.peak)} kg max. · ${fmt(last.volume)} kg Volumen · ${last.count} Sätze</p>`:''}<div class="section-header"><h3>Trainingsverlauf</h3></div><div style="overflow:auto"><table class="stat-table"><thead><tr><th>Datum</th><th>Sätze</th><th>Max. kg</th><th>Volumen</th></tr></thead><tbody>${entries.slice().reverse().map(x=>`<tr><td>${shortDate(x.date)}</td><td>${x.count}</td><td>${fmt(x.peak)}</td><td>${fmt(x.volume)} kg</td></tr>`).join('')}</tbody></table></div></div>`:`<div class="empty"><span class="empty-icon">↗</span><strong>Deine Statistik wartet</strong><p>Öffne „Training“, füge eine Übung hinzu und trage Gewicht und Wiederholungen ein.</p><button class="btn btn-primary" data-action="switch-tab" data-tab="today">Training starten</button></div>`}<div class="notice">Volumen = Summe aus Gewicht × Wiederholungen aller erfassten Sätze einer Übung. Booster, XP und Badges werden rein lokal aus deinem Trainingsverlauf berechnet – ohne kostenpflichtige KI.</div>`;}
-function renderProfile(){
- const rec=accounts.find(a=>a.id===currentId);
- return `<div class="section-header"><div><h2>Dein Profil</h2><p class="intro">${escapeHTML(rec?.name)} · verschlüsselt auf diesem Gerät${rec?.cloudUid?' und online':''}</p></div></div>
- <div class="card"><div class="row"><div class="avatar" style="height:47px;width:47px;font-size:20px">${escapeHTML((rec?.name||'?').slice(0,1).toUpperCase())}</div><div class="grow"><strong>${escapeHTML(rec?.name)}</strong><div class="small muted">Verschlüsseltes Profil mit eigenem Passwort</div></div></div><button class="btn btn-ghost btn-block" data-action="lock" style="margin-top:17px">Profil sperren</button></div>
- <div class="section-header"><h3>Cloud-Synchronisierung</h3></div>${cloudForms()}
- <div class="section-header"><h3>Zusätzliche Sicherung</h3></div><div class="card stack"><p class="intro" style="margin:0">Bei aktivierter Cloud musst du für den normalen Gerätewechsel kein Backup von Hand übertragen. Einen gelegentlichen Export empfehlen wir trotzdem: Auch ein Online-Dienst kann ausfallen oder Daten können versehentlich gelöscht werden.</p><button class="btn btn-primary btn-block" data-action="export-backup">↓ Verschlüsseltes Backup herunterladen (optional)</button><button class="btn btn-ghost btn-block" data-action="import-backup">↑ Backup als zusätzliches Profil importieren</button><div class="notice warning">Ohne aktive Cloud oder bei dauerhaft fehlgeschlagener Synchronisierung liegen neue Einträge nur auf diesem Gerät. Bei Verlust des Profilpassworts lassen sich auch online gespeicherte Trainingsdaten nicht entschlüsseln.</div></div>
- <div class="section-header"><h3>Datenschutz und Updates</h3></div><div class="card"><p class="intro">KRAFTLOG verschlüsselt Trainingsdaten mit AES-GCM. Der neue Booster-, Timer- und Mini-Gym-Stand wird ebenfalls im verschlüsselten Profil gespeichert. Im öffentlichen GitHub-Repository steht nur der App-Code; die Cloud-Daten gehören zu deinem angemeldeten Online-Konto und sind durch Firebase-Sicherheitsregeln geschützt.</p><p class="intro">Die bisherigen lokalen Daten werden beim Update nicht gelöscht. Wichtig ist, dieselbe GitHub-Pages-Webadresse zu behalten. Der Online-Stand kann auf neuen Geräten wiederhergestellt werden.</p></div>
- <div class="section-header"><h3>Profil von diesem Gerät entfernen</h3></div><button class="btn btn-red btn-block" data-action="delete-profile">Lokales Profil löschen (Cloud bleibt erhalten)</button>`;
+
+function renderToday(){
+ const s=session(),entries=s?s.exercises:[];
+ const strengthSets=entries.reduce((n,e)=>n+(isCardioExercise(e)?0:exSetCount(e)),0);
+ const vol=entries.reduce((n,e)=>n+(isCardioExercise(e)?0:exVolume(e)),0);
+ const cardioMin=entries.reduce((n,e)=>n+cardioDuration(e),0);
+ return `<section class="hero"><span class="eyebrow">DEIN TRAININGSLOG</span><h2>Trainiere. Sammle. Gestalte.</h2><p>Modernes braunes Interface, Kraft und Cardio in einer App, Booster-Packs und ein frei gestaltbares Mini-Gym.</p><div class="hero-footer"><span class="stat-pill"><strong>${entries.length}</strong> Einträge</span><span class="stat-pill"><strong id="day-set-count">${strengthSets}</strong> Kraft-Sätze</span><span class="stat-pill"><strong id="day-vol-total">${fmt(vol)} kg</strong> Volumen</span><span class="stat-pill"><strong id="day-cardio-total">${fmt(cardioMin)} min</strong> Cardio</span></div></section>${renderDateBar()}<div class="section-header"><h2>Dein Training</h2><span class="subtitle">${s?escapeHTML(s.planName)+(s.updatedAt?' · '+new Date(s.updatedAt).toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'}):''):'Noch nicht gestartet'}</span></div><div class="btn-wrap" style="margin-bottom:13px"><button class="btn btn-primary" data-action="open-plan-picker">Trainingsplan auswählen</button><button class="btn" data-action="switch-tab" data-tab="library">Übung hinzufügen</button></div>${renderBoosterStatus(s)}${entries.length?`<div class="stack" style="margin-top:12px">${entries.map(e=>renderSessionExercise(e)).join('')}</div>`:`<div class="empty"><strong>Noch keine Übungen für diesen Tag</strong><p>Wähle einen Plan oder füge einzelne Kraft- und Cardio-Einheiten hinzu.</p><button class="btn btn-secondary" data-action="open-plan-picker">Plan auswählen</button></div>`}${renderRecentDates()}`;
 }
 
-function modalMarkup(title,body,foot=''){return `<div class="overlay" id="overlay" role="presentation"><section class="sheet" role="dialog" aria-modal="true" aria-label="${escapeHTML(title)}"><div class="sheet-head"><h3>${escapeHTML(title)}</h3><button class="btn btn-icon btn-small btn-ghost" data-action="close-modal" aria-label="Schließen">×</button></div><div class="sheet-body">${body}</div>${foot?`<div class="sheet-foot">${foot}</div>`:''}</section></div>`;}
-function checklist(ids){const selected=new Set(ids);return `<div class="select-exercises">${allExercises().map(ex=>`<label class="select-ex"><input type="checkbox" data-select-ex="${ex.id}" ${selected.has(ex.id)?'checked':''}>${artBox(ex)}<span class="grow"><strong>${escapeHTML(ex.name)}</strong><small>${escapeHTML(ex.group)} · ${escapeHTML(ex.equipment)}</small></span></label>`).join('')}</div>`;}
-function renderModal(){const root=el('modal-root');if(!modal){root.innerHTML='';return;}if(modal.type==='choosePlan'){const p=data.plans.find(p=>p.id===modal.planId)||data.plans[0];root.innerHTML=modalMarkup('Trainingsplan wählen',`<div class="field"><label for="choose-plan">Plan</label><select id="choose-plan" class="input">${data.plans.map(p=>`<option value="${p.id}" ${p.id===modal.planId?'selected':''}>${escapeHTML(p.name)}</option>`).join('')}</select></div><p class="modal-help">Wähle vor dem Start Übungen an oder ab. Bereits eingetragene Übungen an diesem Tag werden nicht gelöscht.</p>${checklist(modal.ids)}`,`<button class="btn btn-primary btn-block" data-action="apply-plan" ${modal.ids.length?'':'disabled'}>Mit ${modal.ids.length} Übungen übernehmen</button>`);}else if(modal.type==='editPlan'){const p=modal.draft;root.innerHTML=modalMarkup(modal.isNew?'Trainingsplan erstellen':'Trainingsplan bearbeiten',`<div class="field"><label for="plan-name">Name des Plans</label><input class="input" id="plan-name" maxlength="50" value="${escapeHTML(p.name)}" placeholder="z. B. Oberkörper A"></div><p class="modal-help">Lege fest, welche Übungen standardmäßig in deinem Plan enthalten sind. Vor jedem Training kannst du die Auswahl ändern.</p>${checklist(p.exerciseIds)}`,`<div class="btn-wrap"><button class="btn btn-primary grow" data-action="save-plan">Plan speichern</button>${!modal.isNew?`<button class="btn btn-red" data-action="delete-plan">Löschen</button>`:''}</div>`);}else if(modal.type==='infoExercise'){const ex=getEx(modal.exId);root.innerHTML=modalMarkup(ex.name,`<div style="max-width:410px;margin:0 auto 15px;height:220px" class="library-art">${art(ex.art)}</div><div class="row" style="margin-bottom:10px"><span class="tag">${escapeHTML(ex.group)}</span><span class="tag">${escapeHTML(ex.equipment)}</span></div><p class="intro">${escapeHTML(EXERCISE_TIPS[ex.id]||'Individuell angelegte Übung. Achte auf die Gerätebeschriftung im Studio und eine kontrollierte Ausführung.')}</p><p class="modal-help">Die Zeichnung dient nur zur Orientierung und ersetzt keine Übungsanleitung durch eine Fachperson.</p>`,`<button class="btn btn-primary btn-block" data-action="info-add" data-ex="${escapeHTML(ex.id)}">＋ Für ${shortDate(selectedDate)} hinzufügen</button>`);}else if(modal.type==='customExercise'){root.innerHTML=modalMarkup('Eigene Übung erstellen',`<div class="stack"><div class="field"><label for="custom-name">Übungsname</label><input class="input" id="custom-name" maxlength="60" placeholder="z. B. Hackenschmidt-Presse"></div><div class="field"><label for="custom-group">Muskelgruppe</label><select class="input" id="custom-group">${GROUPS.slice(1).map(g=>`<option>${g}</option>`).join('')}</select></div><div class="field"><label for="custom-kind">Art</label><select class="input" id="custom-kind"><option>Maschine</option><option>Freihantel</option><option>Kabelzug</option><option>Körpergewicht</option></select></div><div class="notice">Für eigene Übungen wird eine passende schematische Standardillustration angezeigt.</div></div>`,`<button class="btn btn-primary btn-block" data-action="save-custom">Übung erstellen & hinzufügen</button>`);}else if(modal.type==='booster'){root.innerHTML=modalMarkup('Booster-Pack geöffnet',`<div class="notice" style="margin-top:0">Glückwunsch! Für dein vollständiges Workout am ${shortDate(modal.date)} wurden neue Fundstücke freigeschaltet.</div>${renderBoosterItems(modal.itemIds)}<p class="intro" style="margin-top:14px">Alle Gegenstände wurden deinem Inventar hinzugefügt und können im Mini-Gym platziert werden.</p>`,`<div class="btn-wrap"><button class="btn btn-primary grow" data-action="booster-to-stats">Zum Mini-Gym</button><button class="btn grow" data-action="close-modal">Weiter</button></div>`);}}
+
+function renderCardioExercise(e){
+ const ex=getEx(e.id),c=cardioShape(e),previous=priorExercise(e.id),last=previous?.ex?.cardio||null;
+ const lastLine=last?`${fmt(last.duration)} min · ${fmt(last.distance)} km · ${fmt(last.calories)} kcal`:'Noch kein früherer Eintrag';
+ return `<article class="card exercise-card cardio-card"><div class="ex-head">${artBox(ex)}<div class="ex-info"><h3>${escapeHTML(ex.name)}</h3><p>${escapeHTML(ex.group)} · ${escapeHTML(ex.equipment)}</p><p class="ex-date">${previous?'Letzte Einheit: '+shortDate(previous.date):'Noch kein früherer Eintrag'}</p></div><button class="btn btn-icon btn-small btn-ghost" data-action="remove-ex" data-ex="${escapeHTML(ex.id)}" aria-label="Eintrag entfernen">×</button></div><div class="ex-detail">${previous?`<div class="ex-history"><strong>Zuletzt · ${shortDate(previous.date)}:</strong> ${lastLine}</div><div class="prior-control"><button type="button" class="btn btn-secondary btn-small btn-block" data-action="copy-prior-cardio" data-ex="${escapeHTML(e.id)}">Letzte Werte übernehmen</button></div>`:''}<div class="sets-table cardio-grid"><div class="set-col"><label for="dur-${escapeHTML(ex.id)}">DAUER (MIN)</label><input id="dur-${escapeHTML(ex.id)}" class="input input-sm" type="number" min="0" step="1" placeholder="${last?fmt(last.duration):'0'}" data-cardio-field="duration" data-ex="${escapeHTML(ex.id)}" value="${escapeHTML(c.duration)}"></div><div class="set-col"><label for="dist-${escapeHTML(ex.id)}">DISTANZ (KM)</label><input id="dist-${escapeHTML(ex.id)}" class="input input-sm" type="number" min="0" step="0.1" placeholder="${last?fmt(last.distance):'0'}" data-cardio-field="distance" data-ex="${escapeHTML(ex.id)}" value="${escapeHTML(c.distance)}"></div><div class="set-col"><label for="cal-${escapeHTML(ex.id)}">KALORIEN</label><input id="cal-${escapeHTML(ex.id)}" class="input input-sm" type="number" min="0" step="1" placeholder="${last?fmt(last.calories):'0'}" data-cardio-field="calories" data-ex="${escapeHTML(ex.id)}" value="${escapeHTML(c.calories)}"></div></div><div class="ex-foot"><span class="small muted">Eintrag: <strong id="cardio-summary-${escapeHTML(ex.id)}">${fmt(cardioDuration(e))} min · ${fmt(cardioDistance(e))} km · ${fmt(cardioCalories(e))} kcal</strong></span></div></div></article>`;
+}
+function renderSessionExercise(e){
+ if(isCardioExercise(e))return renderCardioExercise(e);
+ const ex=getEx(e.id),previous=priorExercise(e.id),priorSets=previous?previous.ex.sets.filter(validSet):[],volume=exVolume(e),n=exSetCount(e);
+ return `<article class="card exercise-card"><div class="ex-head">${artBox(ex)}<div class="ex-info"><h3>${escapeHTML(ex.name)}</h3><p>${escapeHTML(ex.group)} · ${escapeHTML(ex.equipment)}</p><p class="ex-date">${previous?'Letztes Training: '+shortDate(previous.date):'Noch kein früherer Eintrag'}</p></div><button class="btn btn-icon btn-small btn-ghost" aria-label="Übung entfernen" title="Übung entfernen" data-action="remove-ex" data-ex="${escapeHTML(ex.id)}">×</button></div><div class="ex-detail">${previous?`<div class="ex-history"><strong>Zuletzt · ${shortDate(previous.date)}:</strong> ${priorSets.map(s=>`${fmt(s.kg)} kg × ${fmt(s.reps)}`).join(' · ')}<br><span>Volumen: ${fmt(exVolume(previous.ex))} kg</span></div><div class="prior-control"><p>Die vorgeschlagenen Werte werden erst nach deiner Übernahme gespeichert.</p><button type="button" class="btn btn-secondary btn-small btn-block" data-action="copy-prior-all" data-ex="${escapeHTML(e.id)}">Alle letzten Sätze übernehmen</button></div>`:''}<div class="sets-table">${e.sets.map((s,i)=>renderSetRow(e,s,i,priorSets)).join('')}</div><div class="ex-foot"><button class="btn btn-small" data-action="add-set" data-ex="${escapeHTML(ex.id)}">Satz hinzufügen</button><span class="small muted">Volumen: <strong class="vol" id="volume-${escapeHTML(ex.id)}">${fmt(volume)} kg</strong> · <span id="setcount-${escapeHTML(ex.id)}">${n}</span> Sätze</span></div></div></article>`;
+}
+
+function renderFilters(active){return `<div class="filters">${GROUPS.map(g=>`<button class="chip ${g===active?'active':''}" data-action="filter-group" data-group="${g}">${g}</button>`).join('')}</div>`;}
+
+function renderLibrary(){
+ const s=session(),selected=new Set(s?.exercises.map(e=>e.id)||[]),exs=allExercises().filter(ex=>(libraryGroup==='Alle'||ex.group===libraryGroup)&&(ex.name+' '+ex.equipment).toLowerCase().includes(libraryQuery.toLowerCase()));
+ return `<div class="section-header"><div><h2>Übungen</h2><div class="intro">Füge Kraft- oder Cardio-Übungen für ${shortDate(selectedDate)} hinzu.</div></div></div><div class="library-tools"><input class="input" id="library-search" value="${escapeHTML(libraryQuery)}" placeholder="Übung suchen, z. B. Latzug oder Laufband" autocomplete="off">${renderFilters(libraryGroup)}</div><div class="exercise-grid" id="library-results">${exs.map(ex=>`<article class="library-card"><button class="library-art" type="button" data-action="exercise-info" data-ex="${escapeHTML(ex.id)}" aria-label="Bild und Erklärung: ${escapeHTML(ex.name)}">${art(ex.art)}</button><div><h3>${escapeHTML(ex.name)}</h3><p>${escapeHTML(ex.group)} · ${escapeHTML(ex.equipment)}${isCardioExercise(ex)?' · Cardio':''}</p></div><button class="btn btn-small ${selected.has(ex.id)?'btn-secondary':'btn-primary'} btn-block" data-action="toggle-exercise" data-ex="${escapeHTML(ex.id)}">${selected.has(ex.id)?'Ausgewählt':'Hinzufügen'}</button></article>`).join('')}</div>${!exs.length?`<div class="empty">Keine passende Übung gefunden.</div>`:''}<div class="section-header"><h3>Eigene Übung fehlt?</h3></div><button class="btn btn-ghost btn-block" data-action="new-exercise">Eigene Übung anlegen</button><div class="notice">Die Illustrationen wurden an den neuen braunen Farbstil angepasst und dienen als Orientierung.</div>`;
+}
+
+
+
+function renderRecentDates(){
+ const dates=data.sessions.filter(s=>s.exercises.some(entryCompleted)).sort((a,b)=>b.date.localeCompare(a.date)).slice(0,5);
+ if(!dates.length)return '';
+ return `<div class="section-header"><h3>Letzte Trainingstage</h3></div><div class="card stack">${dates.map(s=>{const vol=s.exercises.reduce((sum,e)=>sum+(isCardioExercise(e)?0:exVolume(e)),0),cardio=s.exercises.reduce((sum,e)=>sum+cardioDuration(e),0);return `<button class="btn btn-ghost" style="justify-content:space-between" data-action="jump-date" data-date="${s.date}"><span>${shortDate(s.date)} · ${escapeHTML(s.planName||'Freies Training')}</span><span class="accent">${vol?fmt(vol)+' kg':''}${vol&&cardio?' · ':''}${cardio?fmt(cardio)+' min':''}</span></button>`;}).join('')}</div>`;
+}
+function renderPlans(){return `<div class="section-header"><div><h2>Deine Trainingspläne</h2><p class="intro">Erstelle Pläne oder passe die Vorschläge an. Vor jedem Training kannst du Übungen an- und abwählen.</p></div></div><div class="stack">${data.plans.map(p=>`<article class="card plan-card"><div class="plan-art"></div><h3>${escapeHTML(p.name)}</h3><p>${p.exerciseIds.length} Einträge</p><div class="chiplist">${p.exerciseIds.slice(0,7).map(id=>`<span>${escapeHTML(getEx(id).name)}</span>`).join('')}${p.exerciseIds.length>7?`<span>+${p.exerciseIds.length-7}</span>`:''}</div><div class="btn-wrap"><button class="btn btn-primary btn-small" data-action="start-plan" data-plan="${p.id}">Für ${shortDate(selectedDate)} verwenden</button><button class="btn btn-small" data-action="edit-plan" data-plan="${p.id}">Bearbeiten</button></div></article>`).join('')}</div><button class="btn btn-secondary btn-block" style="margin-top:12px" data-action="edit-plan" data-plan="">Eigenen Trainingsplan erstellen</button>`;}
+function plotChart(entries,metric){if(!entries.length)return `<div class="empty"><strong>Noch keine Daten</strong><p>Trage Kraftdaten ein, dann erscheint hier dein Fortschritt.</p></div>`;const pts=entries.slice(-14);const W=700,H=244,p={l:52,r:17,t:23,b:44};const vals=pts.map(x=>metric==='volume'?x.volume:x.peak);const max=Math.max(1,...vals);const yMax=Math.ceil(max/Math.pow(10,Math.floor(Math.log10(max)))*1.13)*Math.pow(10,Math.floor(Math.log10(max)));const xAt=i=>p.l+(pts.length===1?(W-p.l-p.r)/2:i*(W-p.l-p.r)/(pts.length-1));const yAt=v=>H-p.b-(v/yMax)*(H-p.t-p.b);const xy=pts.map((x,i)=>[xAt(i),yAt(vals[i])]);const grid=[0,.25,.5,.75,1].map(f=>`<line x1="${p.l}" y1="${yAt(yMax*f)}" x2="${W-p.r}" y2="${yAt(yMax*f)}" stroke="#6b5a4f" stroke-dasharray="4 6"/><text x="${p.l-9}" y="${yAt(yMax*f)+4}" fill="#8e7f71" text-anchor="end" font-size="12">${fmt(yMax*f)}</text>`).join('');const path=xy.map((a,i)=>`${i?'L':'M'}${a[0].toFixed(1)} ${a[1].toFixed(1)}`).join(' ');const area=path+` L${xy.at(-1)[0]} ${H-p.b} L${xy[0][0]} ${H-p.b} Z`;const indices=[0,Math.floor((pts.length-1)/2),pts.length-1].filter((v,i,a)=>a.indexOf(v)===i);return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Verlaufsdiagramm"><defs><linearGradient id="areafill" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#b98d68" stop-opacity=".26"/><stop offset="1" stop-color="#b98d68" stop-opacity="0"/></linearGradient></defs>${grid}<path d="${area}" fill="url(#areafill)"/><path d="${path}" fill="none" stroke="#8a6247" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>${xy.map((a,i)=>`<circle cx="${a[0]}" cy="${a[1]}" r="5" fill="#8a6247" stroke="#f4ece2" stroke-width="2"/><title>${shortDate(pts[i].date)}: ${fmt(vals[i])} kg</title>`).join('')}${indices.map(i=>`<text x="${xAt(i)}" y="${H-15}" fill="#8e7f71" font-size="12" text-anchor="middle">${shortDate(pts[i].date).slice(0,5)}</text>`).join('')}</svg>`;}
+function renderStats(){const game=gamificationStats();const usedIds=new Set(allEntries().filter(x=>!isCardioExercise(x.ex)).map(x=>x.ex.id));const exercises=allExercises().filter(e=>usedIds.has(e.id));if(exercises.length&&!usedIds.has(statExercise))statExercise=exercises[0].id;const entries=exerciseEntries(statExercise),last=entries.at(-1),cardioEntries=allCardioEntries().slice(-6).reverse();return `<div class="section-header"><div><h2>Deine Statistik</h2><p class="intro">Fortschritt, Cardio-Auswertung und Ausbau deines Mini-Gyms.</p></div></div><div class="hero" style="margin-bottom:14px"><div class="hero-footer"><span class="stat-pill"><strong>${game.level}</strong> Level</span><span class="stat-pill"><strong>${game.totalSessions}</strong> Sessions</span><span class="stat-pill"><strong>${fmt(game.totalVolume)} kg</strong> Volumen</span><span class="stat-pill"><strong>${fmt(game.totalCardioMinutes)} min</strong> Cardio</span><span class="stat-pill"><strong>${game.uniqueItems}</strong> Items</span></div><div class="progress-bar" style="margin-top:16px"><span style="width:${Math.max(6,Math.round(game.levelProgress/game.levelGoal*100))}%"></span></div><p class="small muted" style="margin:10px 0 0">${game.levelTitle} · ${game.xp} XP · ${game.streak} Tage Streak</p></div><div class="stats-grid"><div class="card metric-card"><strong>${fmt(game.totalCardioDistance)} km</strong><small>Cardio-Distanz</small></div><div class="card metric-card"><strong>${fmt(game.totalCardioCalories)}</strong><small>Cardio-Kalorien</small></div><div class="card metric-card"><strong>${game.recordHits}</strong><small>Bestwerte</small></div><div class="card metric-card"><strong>${game.boosterCount}</strong><small>Booster</small></div></div><div class="section-header"><h3>Wochenziele</h3></div><div class="stack">${game.missions.map(m=>`<div class="card mission-card"><div class="row between"><strong>${escapeHTML(m.label)}</strong><span>${m.current}/${m.target}</span></div><div class="progress-bar"><span style="width:${Math.min(100,Math.round(m.current/m.target*100))}%"></span></div></div>`).join('')}</div><div class="section-header"><h3>Badges</h3></div><div class="badge-grid">${game.badges.map(b=>`<div class="card badge-card ${b.earned?'earned':''}"><span class="badge-code">${b.code}</span><strong>${escapeHTML(b.name)}</strong><small>${b.earned?'Freigeschaltet':'Noch offen'}</small></div>`).join('')}</div><div class="section-header"><h3>Kraft-Verlauf</h3></div>${exercises.length?`<div class="card"><div class="row wrap" style="gap:12px"><div class="field grow"><label for="stat-exercise">Übung</label><select id="stat-exercise" class="input">${exercises.map(ex=>`<option value="${ex.id}" ${ex.id===statExercise?'selected':''}>${escapeHTML(ex.name)}</option>`).join('')}</select></div><div class="field"><label>Ansicht</label><div class="btn-wrap"><button class="btn btn-small ${statMetric==='volume'?'btn-primary':'btn-ghost'}" data-action="metric" data-metric="volume">Volumen</button><button class="btn btn-small ${statMetric==='peak'?'btn-primary':'btn-ghost'}" data-action="metric" data-metric="peak">Max Gewicht</button></div></div></div>${plotChart(entries,statMetric)}${last?`<p class="small muted">Letzter Wert · ${shortDate(last.date)} · ${statMetric==='volume'?fmt(last.volume)+' kg':fmt(last.peak)+' kg'}</p>`:''}</div>`:`<div class="empty"><strong>Noch keine Kraftdaten</strong><p>Trage Gewichte und Wiederholungen ein, um Diagramme zu sehen.</p></div>`}<div class="section-header"><h3>Cardio-Verlauf</h3></div>${cardioEntries.length?`<div class="stack">${cardioEntries.map(x=>`<div class="card"><div class="row between"><strong>${shortDate(x.date)} · ${escapeHTML(getEx(x.ex.id).name)}</strong><span class="status-chip">${fmt(cardioDuration(x.ex))} min</span></div><p class="intro" style="margin-top:8px">${fmt(cardioDistance(x.ex))} km · ${fmt(cardioCalories(x.ex))} kcal</p></div>`).join('')}</div>`:`<div class="empty"><strong>Noch keine Cardio-Daten</strong><p>Nutze den neuen Cardio-Modus im Training.</p></div>`}<div class="section-header"><h3>Mini-Gym</h3></div>${renderMiniGym()}`;}
+function renderProfile(){const rec=accounts.find(a=>a.id===currentId),stats=gamificationStats();return `<div class="section-header"><div><h2>Profil</h2><p class="intro">Sichere deine Daten, ändere dein Passwort und verwalte die neue App-Version.</p></div></div><div class="card stack"><div class="row between"><div><strong>${escapeHTML(rec?.name||'Profil')}</strong><div class="small muted">Level ${stats.level} · ${stats.levelTitle}</div></div><span class="avatar" style="width:54px;height:54px">${escapeHTML((rec?.name||'?').slice(0,1).toUpperCase())}</span></div><div class="btn-wrap"><button class="btn btn-secondary grow" data-action="open-change-password">Passwort ändern</button><button class="btn btn-ghost" data-action="lock">Sperren</button></div></div><div class="section-header"><h3>Synchronisierung</h3></div>${cloudForms()}<div class="section-header"><h3>Backups</h3></div><div class="card stack"><p class="intro" style="margin:0">Du kannst zusätzlich zur optionalen Cloud jederzeit ein verschlüsseltes Backup exportieren oder importieren.</p><button class="btn btn-primary btn-block" data-action="export-backup">Verschlüsseltes Backup herunterladen</button><button class="btn btn-ghost btn-block" data-action="import-backup">Backup als zusätzliches Profil importieren</button></div><div class="section-header"><h3>Neues Update</h3></div><div class="card"><p class="intro">Enthalten sind der braunere moderne Farbstil, ein Cardio-Modus, Booster-Packs mit exakt einem Item pro vollständigem Training, mindestens 100 Collectibles und ein ausbaubares Mini-Gym mit bis zu 10 platzierbaren Gegenständen.</p></div><div class="section-header"><h3>Profil von diesem Gerät entfernen</h3></div><button class="btn btn-red btn-block" data-action="delete-profile">Lokales Profil löschen (Cloud bleibt erhalten)</button>`;}
 function refreshModalKeepScroll(){const old=$('.sheet-body')?.scrollTop||0;renderModal();if($('.sheet-body'))$('.sheet-body').scrollTop=old;}
 function setDay(date){if(!/^\d{4}-\d{2}-\d{2}$/.test(date)||Number.isNaN(new Date(date+'T12:00:00').getTime()))return;selectedDate=date;activeTab='today';render();}
 function switchTab(tab){activeTab=tab;render();window.scrollTo({top:0,behavior:'instant'});}
-function syncVolume(){const s=session();if(!s)return;const tot=s.exercises.reduce((sum,x)=>sum+exVolume(x),0),sets=s.exercises.reduce((sum,x)=>sum+exSetCount(x),0);if(el('day-set-count'))el('day-set-count').textContent=sets;if(el('day-vol-total'))el('day-vol-total').textContent=fmt(tot)+' kg';syncBoosterStatus();}
+function syncVolume(){const s=session();if(!s)return;const tot=s.exercises.reduce((sum,x)=>sum+(isCardioExercise(x)?0:exVolume(x)),0),sets=s.exercises.reduce((sum,x)=>sum+(isCardioExercise(x)?0:exSetCount(x)),0),cardio=s.exercises.reduce((sum,x)=>sum+cardioDuration(x),0);if(el('day-set-count'))el('day-set-count').textContent=sets;if(el('day-vol-total'))el('day-vol-total').textContent=fmt(tot)+' kg';if(el('day-cardio-total'))el('day-cardio-total').textContent=fmt(cardio)+' min';syncBoosterStatus();}
+async function changeProfilePassword(currentPassword,newPassword){const rec=accounts.find(a=>a.id===currentId);if(!rec)throw new Error('Profil nicht gefunden');const currentKeyCheck=await deriveKey(currentPassword,base64ToBytes(rec.salt));await decryptText(rec,currentKeyCheck);const newSalt=crypto.getRandomValues(new Uint8Array(16)),newKey=await deriveKey(newPassword,newSalt),encrypted=await encryptText(JSON.stringify(data),newKey);rec.salt=bytesToBase64(newSalt);rec.iv=encrypted.iv;rec.cipher=encrypted.cipher;rec.updatedAt=new Date().toISOString();currentKey=newKey;writeAccounts();scheduleCloudSync();}
 
-/* Synchronisierung: verschlüsselter Upload mit Firestore-Versionsprüfung.
-   Bei Konflikten werden Daten NIEMALS automatisch überschrieben. */
-function cloudSafeProfile(rec){
- const {id,name,salt,iv,cipher,createdAt,updatedAt}=rec;
- return {id,name,salt,iv,cipher,createdAt,updatedAt};
+function modalMarkup(title,body,foot=''){return `<div class="overlay" id="overlay" role="presentation"><section class="sheet" role="dialog" aria-modal="true" aria-label="${escapeHTML(title)}"><div class="sheet-head"><h3>${escapeHTML(title)}</h3><button class="btn btn-icon btn-small btn-ghost" data-action="close-modal" aria-label="Schließen">×</button></div><div class="sheet-body">${body}</div>${foot?`<div class="sheet-foot">${foot}</div>`:''}</section></div>`;}
+function checklist(ids){const selected=new Set(ids);return `<div class="select-exercises">${allExercises().map(ex=>`<label class="select-ex"><input type="checkbox" data-select-ex="${ex.id}" ${selected.has(ex.id)?'checked':''}>${artBox(ex)}<span class="grow"><strong>${escapeHTML(ex.name)}</strong><small>${escapeHTML(ex.group)} · ${escapeHTML(ex.equipment)}</small></span></label>`).join('')}</div>`;}
+
+function renderModal(){
+ const root=el('modal-root');
+ if(!modal){root.innerHTML='';return;}
+ if(modal.type==='choosePlan'){
+   root.innerHTML=modalMarkup('Trainingsplan wählen',`<div class="field"><label for="choose-plan">Plan</label><select id="choose-plan" class="input">${data.plans.map(p=>`<option value="${p.id}" ${p.id===modal.planId?'selected':''}>${escapeHTML(p.name)}</option>`).join('')}</select></div><p class="modal-help">Wähle vor dem Start Übungen an oder ab. Bereits eingetragene Übungen an diesem Tag werden nicht gelöscht.</p>${checklist(modal.ids)}`,`<button class="btn btn-primary btn-block" data-action="apply-plan" ${modal.ids.length?'':'disabled'}>Mit ${modal.ids.length} Übungen übernehmen</button>`);
+ }else if(modal.type==='editPlan'){
+   const p=modal.draft;root.innerHTML=modalMarkup(modal.isNew?'Trainingsplan erstellen':'Trainingsplan bearbeiten',`<div class="field"><label for="plan-name">Name des Plans</label><input class="input" id="plan-name" maxlength="50" value="${escapeHTML(p.name)}" placeholder="z. B. Oberkörper A"></div><p class="modal-help">Lege fest, welche Übungen standardmäßig in deinem Plan enthalten sind. Vor jedem Training kannst du die Auswahl ändern.</p>${checklist(p.exerciseIds)}`,`<div class="btn-wrap"><button class="btn btn-primary grow" data-action="save-plan">Plan speichern</button>${!modal.isNew?`<button class="btn btn-red" data-action="delete-plan">Löschen</button>`:''}</div>`);
+ }else if(modal.type==='infoExercise'){
+   const ex=getEx(modal.exId);root.innerHTML=modalMarkup(ex.name,`<div style="max-width:410px;margin:0 auto 15px;height:220px" class="library-art">${art(ex.art)}</div><div class="row" style="margin-bottom:10px"><span class="tag">${escapeHTML(ex.group)}</span><span class="tag">${escapeHTML(ex.equipment)}</span><span class="tag">${isCardioExercise(ex)?'Cardio':'Kraft'}</span></div><p class="intro">${escapeHTML(EXERCISE_TIPS[ex.id]||'Individuell angelegte Übung. Achte auf saubere Technik und einen kontrollierten Ablauf.')}</p>`,`<button class="btn btn-primary btn-block" data-action="info-add" data-ex="${escapeHTML(ex.id)}">Für ${shortDate(selectedDate)} hinzufügen</button>`);
+ }else if(modal.type==='customExercise'){
+   root.innerHTML=modalMarkup('Eigene Übung erstellen',`<div class="stack"><div class="field"><label for="custom-name">Übungsname</label><input class="input" id="custom-name" maxlength="60" placeholder="z. B. Hackenschmidt-Presse"></div><div class="field"><label for="custom-group">Kategorie</label><select class="input" id="custom-group">${GROUPS.slice(1).map(g=>`<option>${g}</option>`).join('')}</select></div><div class="field"><label for="custom-kind">Art</label><select class="input" id="custom-kind"><option>Maschine</option><option>Freihantel</option><option>Kabelzug</option><option>Körpergewicht</option><option>Gerät</option><option>Outdoor</option></select></div></div>`,`<button class="btn btn-primary btn-block" data-action="save-custom">Übung erstellen und hinzufügen</button>`);
+ }else if(modal.type==='booster'){
+   root.innerHTML=modalMarkup('Booster-Pack geöffnet',`<div class="notice" style="margin-top:0">Glückwunsch. Für dein vollständiges Workout am ${shortDate(modal.date)} wurde ein neues Objekt freigeschaltet.</div>${renderBoosterItems(modal.itemIds)}<p class="intro" style="margin-top:14px">Der Gegenstand wurde deinem Inventar hinzugefügt und – wenn Platz frei war – direkt in dein Mini-Gym gestellt.</p>`,`<div class="btn-wrap"><button class="btn btn-primary grow" data-action="booster-to-stats">Zum Mini-Gym</button><button class="btn grow" data-action="close-modal">Weiter</button></div>`);
+ }else if(modal.type==='changePassword'){
+   root.innerHTML=modalMarkup('Passwort ändern',`<div class="stack"><div class="field"><label for="pw-current">Aktuelles Passwort</label><input id="pw-current" class="input" type="password" autocomplete="current-password"></div><div class="field"><label for="pw-new">Neues Passwort</label><input id="pw-new" class="input" type="password" minlength="8" autocomplete="new-password"></div><div class="field"><label for="pw-confirm">Neues Passwort wiederholen</label><input id="pw-confirm" class="input" type="password" minlength="8" autocomplete="new-password"></div></div>`,`<button class="btn btn-primary btn-block" data-action="save-password">Passwort speichern</button>`);
+ }
 }
+
+function cloudSafeProfile(rec){const {id,name,salt,iv,cipher,createdAt,updatedAt}=rec;return {id,name,salt,iv,cipher,createdAt,updatedAt};}
 function validCloudProfile(p){
  if(!p||typeof p.id!=='string'||typeof p.name!=='string'||p.name.length>70)return false;
  try {return ['salt','iv','cipher'].every(k=>typeof p[k]==='string'&&p[k].length>8)&&base64ToBytes(p.salt).length===16&&base64ToBytes(p.iv).length===12;}catch{return false;}
@@ -615,19 +654,26 @@ async function handleClick(event){const btn=event.target.closest('[data-action]'
   case 'remove-set':{const ex=session()?.exercises.find(e=>e.id===btn.dataset.ex);if(!ex)break;const set=ex.sets.find(s=>s.id===btn.dataset.set);if(set&&validSet(set)&&!confirm('Erfassten Satz wirklich löschen?'))break;ex.sets=ex.sets.filter(s=>s!==set);if(!ex.sets.length)ex.sets.push({id:uid(),kg:'',reps:''});save();render();break;}
   case 'open-plan-picker':{const p=data.plans[0];modal={type:'choosePlan',planId:p?.id,ids:[...(p?.exerciseIds||[])]};renderModal();break;}
   case 'start-plan':{const p=data.plans.find(x=>x.id===btn.dataset.plan);modal={type:'choosePlan',planId:p.id,ids:[...p.exerciseIds]};renderModal();break;}
-  case 'apply-plan':{const p=data.plans.find(x=>x.id===modal.planId);if(!p||!modal.ids.length){toast('Mindestens eine Übung auswählen');break;}const s=ensureSession();s.planId=p.id;s.planName=p.name;let added=0;modal.ids.forEach(id=>{if(!s.exercises.some(ex=>ex.id===id)){s.exercises.push({id,sets:[{id:uid(),kg:'',reps:''},{id:uid(),kg:'',reps:''},{id:uid(),kg:'',reps:''}]});added++;}});save();modal=null;activeTab='today';render();toast(`${added} Übungen übernommen`);break;}
+  case 'apply-plan':{const p=data.plans.find(x=>x.id===modal.planId);if(!p||!modal.ids.length){toast('Mindestens eine Übung auswählen');break;}const s=ensureSession();s.planId=p.id;s.planName=p.name;let added=0;modal.ids.forEach(id=>{if(!s.exercises.some(ex=>ex.id===id)){s.exercises.push(makeExerciseEntry(id));added++;}});save();modal=null;activeTab='today';render();toast(`${added} Einträge übernommen`);break;}
   case 'edit-plan':{const p=data.plans.find(x=>x.id===btn.dataset.plan);modal={type:'editPlan',isNew:!p,draft:p?{id:p.id,name:p.name,exerciseIds:[...p.exerciseIds]}:{id:uid(),name:'',exerciseIds:[]}};renderModal();break;}
   case 'save-plan':{const p=modal?.draft;if(!p)break;p.name=p.name.trim();if(!p.name){toast('Bitte Plannamen eingeben');$('#plan-name')?.focus();break;}if(!p.exerciseIds.length){toast('Mindestens eine Übung auswählen');break;}if(modal.isNew)data.plans.push(p);else{const idx=data.plans.findIndex(x=>x.id===p.id);if(idx<0)break;data.plans[idx]=p;}save();modal=null;render();toast('Trainingsplan gespeichert');break;}
   case 'delete-plan':{if(data.plans.length<=1){toast('Mindestens ein Plan muss bleiben');break;}if(!confirm('Diesen Trainingsplan löschen? Bereits erfasste Trainings bleiben erhalten.'))break;data.plans=data.plans.filter(p=>p.id!==modal.draft.id);save();modal=null;render();toast('Plan gelöscht');break;}
   case 'new-exercise':modal={type:'customExercise'};renderModal();break;
   case 'exercise-info':modal={type:'infoExercise',exId:btn.dataset.ex};renderModal();break;
   case 'info-add':{const added=addExerciseToSession(btn.dataset.ex);modal=null;activeTab='today';render();toast(added?'Übung hinzugefügt':'Übung ist bereits im Training');break;}
-  case 'save-custom':{const name=$('#custom-name')?.value.trim(),group=$('#custom-group')?.value,equipment=$('#custom-kind')?.value;if(!name){toast('Bitte einen Übungsnamen eingeben');break;}const artType=({Brust:'chest',Rücken:'row',Schultern:'overhead',Beine:'legpress',Bauch:'abs',Arme:'curl'})[group]||'chest';const ex={id:'custom-'+uid(),name:name.slice(0,60),group,equipment,art:artType};data.customExercises.push(ex);addExerciseToSession(ex.id);save();modal=null;activeTab='library';render();toast('Eigene Übung hinzugefügt');break;}
+  case 'save-custom':{const name=$('#custom-name')?.value.trim(),group=$('#custom-group')?.value,equipment=$('#custom-kind')?.value;if(!name){toast('Bitte einen Übungsnamen eingeben');break;}const mode=group==='Cardio'?'cardio':'strength';const artType=group==='Cardio'?(equipment==='Outdoor'?'run':'treadmill'):({Brust:'chest',Rücken:'row',Schultern:'overhead',Beine:'legpress',Bauch:'abs',Arme:'curl'})[group]||'chest';const ex={id:'custom-'+uid(),name:name.slice(0,60),group,equipment,art:artType,mode};data.customExercises.push(ex);addExerciseToSession(ex.id);save();modal=null;activeTab='library';render();toast('Eigene Übung hinzugefügt');break;}
   case 'metric':statMetric=btn.dataset.metric;render();break;
 
   case 'open-session-booster':{const s=session();if(!s?.boosterPack?.items?.length)break;modal={type:'booster',date:s.date,itemIds:s.boosterPack.items};renderModal();break;}
   case 'booster-to-stats':modal=null;switchTab('stats');break;
-  case 'toggle-equip-item':{const id=btn.dataset.item;data.equippedItems=data.equippedItems||[];if(data.equippedItems.includes(id))data.equippedItems=data.equippedItems.filter(x=>x!==id);else if(data.equippedItems.length<4)data.equippedItems.push(id);else {data.equippedItems.shift();data.equippedItems.push(id);}save();render();break;}
+  case 'copy-prior-cardio':{const ex=session()?.exercises.find(e=>e.id===btn.dataset.ex),prior=priorExercise(btn.dataset.ex)?.ex?.cardio;if(!ex||!prior)break;ex.cardio={duration:prior.duration||'',distance:prior.distance||'',calories:prior.calories||'',recordedAt:new Date().toISOString()};save();render();break;}
+  case 'place-item':{const id=btn.dataset.item;if((data.gymLayout||[]).includes(id))removePlacedItemFromGym(id);else if(!placeItemInGym(id)){toast('Maximal 10 Gegenstände gleichzeitig platzierbar');break;}save();render();break;}
+  case 'clear-slot':{const slot=Number(btn.dataset.slot);if(Number.isFinite(slot)&&data.gymLayout?.[slot]){data.gymLayout[slot]=null;save();render();}break;}
+  case 'set-wall':data.gymDesign={...(data.gymDesign||{}),wall:btn.dataset.value};save();render();break;
+  case 'set-floor':data.gymDesign={...(data.gymDesign||{}),floor:btn.dataset.value};save();render();break;
+  case 'set-scene':data.gymDesign={...(data.gymDesign||{}),scene:btn.dataset.value};save();render();break;
+  case 'open-change-password':modal={type:'changePassword'};renderModal();break;
+  case 'save-password':{const cur=$('#pw-current')?.value||'',pw=$('#pw-new')?.value||'',conf=$('#pw-confirm')?.value||'';if(pw.length<8){toast('Neues Passwort braucht mindestens 8 Zeichen');break;}if(pw!==conf){toast('Die neuen Passwörter stimmen nicht überein');break;}await changeProfilePassword(cur,pw);modal=null;render();toast('Passwort geändert');break;}
   case 'toggle-timer-panel':timerState.expanded=!timerState.expanded;saveTimerState();render();break;
   case 'timer-preset':setSinglePreset(Number(btn.dataset.seconds));render();break;
   case 'timer-startpause':startPauseTimer();break;

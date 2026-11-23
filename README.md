@@ -1,109 +1,41 @@
-# KRAFTLOG 2.0 – FitX-Trainingstagebuch, mit optionaler Cloud
+# KRAFTLOG 2.1 – Update: Vorschläge für Gewichte & Wiederholungen
 
-**Kostenlos für private Nutzung: GitHub Pages + Firebase Spark (0 €).**  
-Auf dem Handy nutzbar, ohne Werbung und ohne Abonnement. FitX ist nicht beteiligt.
+Dieses Update ergänzt die vorhandene KRAFTLOG-App um **Werte vom letzten Training**. Es ist für das bestehende GitHub-Repository **muhittinylm-dot/kraftlog** vorbereitet.
 
-## Die beiden Verbesserungen in Version 2.0
+## Was ist neu?
 
-1. **Automatische Online-Synchronisierung:** Trainierte Übungen, Sätze, Gewichte, Pläne und Statistiken werden weiterhin zuerst auf deinem Gerät mit AES-GCM verschlüsselt. Sobald die optionale Firebase-Cloud einmal eingerichtet und dein Profil verbunden ist, wird derselbe verschlüsselte Stand zusätzlich online gespeichert. Beim Gerätewechsel kann er über E-Mail + Online-Passwort und anschließend das bisherige Profilpasswort wiederhergestellt werden. Deine Frau bekommt ihr **eigenes Online-Konto**, getrennt von deinen Daten.
-2. **Updates ohne Datenverlust:** Der vorhandene lokale Speicherschlüssel `kraftlog.profiles.v1` wird weiter verwendet; alte Trainingseinträge werden nicht gelöscht oder neu angelegt. Die Service-Worker-Version ist aktualisiert und lädt neue App-Dateien bei Internetverbindung. Bleibt die GitHub-Pages-Adresse unverändert, bleiben die Browserdaten zugänglich. Nach einem erfolgreichen Cloud-Abgleich lassen sich Daten auch auf einem neuen Gerät wiederherstellen.
+- Wird eine Übung an einem **späteren Datum** erneut gewählt, erscheinen die zuletzt tatsächlich erfassten Gewichte und Wiederholungen als grüne Vorschläge direkt in den Eingabefeldern.
+- Tippe auf **✓ neben einem Satz**, um Gewicht und Wiederholungen aus dem letzten passenden Satz zu übernehmen. Bereits selbst eingetragene Werte bleiben erhalten; nur leere Felder werden ergänzt.
+- Tippe unter einem einzelnen Feld auf **↳ 45 kg** oder **↳ 12 Wdh.**, um nur diesen Wert zu übernehmen. Du kannst diese beiden Felder unabhängig voneinander ändern.
+- Tippe auf **✓ Alle letzten Sätze übernehmen**, um alle letzten Werte einzusetzen, auch wenn es beim letzten Mal mehr als drei Sätze waren. Bereits von dir eingetragene Werte werden **nicht überschrieben**.
+- Du kannst selbstverständlich **immer direkt in ein Eingabefeld tippen** und den vorgeschlagenen Wert durch einen eigenen ersetzen.
 
-**Bitte beachten:** Cloud-Nutzung ist erst aktiv, wenn du die Firebase-Einrichtung unten durchgeführt hast. Nur die ZIP-Datei hochzuladen aktiviert die Cloud *noch nicht*. Auch eine Cloud ist keine unfehlbare Garantie gegen Datenverlust (z. B. Kontosperre, Anbieterfehler oder vergessenes Verschlüsselungspasswort). Manuelle Exporte bleiben deshalb optional verfügbar und sind als zusätzliche Absicherung sinnvoll.
+**Wichtig:** Grüne Vorschläge sind zunächst nur Vorschläge. Sie zählen erst nach Übernahme oder eigener Eingabe als Training. Das Volumen wird aus tatsächlich eingetragenen, vollständigen Sätzen berechnet.
 
-## 1. GitHub Pages: Die neue App oder das Update veröffentlichen
+## Bestehende App aktualisieren – iPhone und GitHub
 
-**Wenn deine alte App schon online ist:** Verwende **exakt dasselbe GitHub-Repository und dieselbe Pages-Adresse**. GitHub Pages > Webseite aktualisieren: Lade die neuen Dateien in das Repository-Hauptverzeichnis hoch und überschreibe `index.html`, `app.js`, `app.css`, `sw.js`, beide Icon-Dateien, `manifest.webmanifest` und `cloud.js`. Lade zusätzlich einmal `firestore.rules` hoch. **Wenn `cloud-config.js` bereits mit echten Firebase-Werten gefüllt ist, überschreibe diese Datei beim Update NICHT durch die leere Vorlage.** Das gilt auch für künftige Updates.
+Du musst **kein neues Repository**, **keine neue Firebase-Datenbank** und **kein neues Benutzerkonto** anlegen.
 
-**Wenn deine App noch nicht online ist:**
+1. Lade **KRAFTLOG-2.1-UPDATE.zip** herunter und öffne die Datei in der iPhone-App **Dateien**. Durch Antippen entpackt iOS sie in einen Ordner.
+2. Öffne im Browser GitHub: https://github.com/muhittinylm-dot/kraftlog/upload/main . Melde dich an, falls nötig. Falls der Upload auf dem Handy nicht sichtbar ist, fordere über die Browseroptionen die **Desktop-Website** an.
+3. Tippe auf **choose your files / Dateien auswählen** und wähle die **vier Dateien direkt aus dem entpackten Ordner** aus: `index.html`, `app.js`, `app.css` und `sw.js`. **Nicht die ZIP-Datei hochladen!**
+4. Achte darauf, dass GitHub die Dateien **im Hauptverzeichnis des vorhandenen Repositories** ersetzt, nicht in einem Unterordner. Unter den Dateinamen sollten Änderungen an vier bestehenden Dateien erkennbar sein.
+5. Tippe auf **Commit changes**. Damit wird GitHub Pages automatisch neu veröffentlicht. Du musst unter Settings → Pages nichts ändern.
+6. Öffne deine bisherige App unter https://muhittinylm-dot.github.io/kraftlog/ . Falls du noch die alte Ansicht siehst, lade die Seite neu, schließe die Web-App ganz und öffne sie erneut. Offline genutzte Geräte benötigen zum Update eine Internetverbindung.
+7. **Entsperre dein bisheriges Profil**, prüfe deine alten Trainingseinträge und – falls Firebase aktiviert ist – unter **Profil** den Synchronisierungsstatus.
 
-1. Auf dem Handy ZIP entpacken. Nur die Dateien aus dem Ordner hochladen, **nicht die ZIP-Datei**.
-2. Auf https://github.com anmelden, ein **öffentliches** Repository, z. B. `kraftlog`, erstellen.
-3. Im Repository **Add file > Upload files**, alle Dateien in das **Hauptverzeichnis** hochladen und committen.
-4. In **Settings > Pages**: Source `Deploy from a branch`, Branch `main`, Folder `/(root)`, speichern.
-5. Öffne `https://DEIN-NAME.github.io/kraftlog/`. Auf Wunsch in Safari/Chrome **Zum Home-Bildschirm** hinzufügen.
+## Wichtig: So bleiben die Daten erhalten
 
-**Bei einem App-Update:** GitHub lädt den neuen Code unter demselben Link. Falls ein Gerät noch die alte Version zeigt, die Seite erneut laden oder die installierte Web-App einmal schließen und öffnen. **Nicht** „Website-Daten löschen“, die App deinstallieren oder das Repository umbenennen, um ein Update zu erzwingen.
+- **Die GitHub-Pages-Adresse bleibt gleich.** Es werden nur vier Code-Dateien ausgetauscht. Die lokale Datenkennung `kraftlog.profiles.v1`, das Datenformat und die Firebase-Synchronisierung werden nicht geändert.
+- **Nicht** das GitHub-Repository löschen oder umbenennen, **nicht** deine Browserdaten löschen und **nicht** das Profil neu erstellen.
+- **Die Datei `cloud-config.js` NICHT überschreiben.** Sie bleibt, wie sie in deinem bestehenden Repository hinterlegt ist. Genau deshalb enthält das Update-ZIP ausschließlich vier Dateien.
+- Öffne die App weiter über denselben Browser oder dieselbe installierte Web-App. Andere Browser können zunächst andere lokale Daten anzeigen. Eine erfolgreich eingerichtete Cloud-Synchronisierung ermöglicht die Wiederherstellung.
+- Ein lokaler Browser kann Daten trotzdem verlieren. Die Cloud schützt nur, wenn dein Profil wirklich verbunden ist und die App den erfolgreichen Sync bestätigt. Ein zusätzlicher verschlüsselter Export vor größeren Änderungen ist optional sinnvoll.
 
-## 2. Kostenlosen Firebase-Cloud-Dienst aktivieren (einmal durch dich)
+## Beispiel
 
-Firebase ist **nicht** dasselbe wie GitHub Pages. GitHub hostet die App, Firebase speichert die verschlüsselten Trainingsdaten und verwaltet die Nutzer-Logins.
+Am 19.11. hast du am Latzug **50 kg × 8**, **45 kg × 12** und **55 kg × 7** trainiert. Am 21.11. wählst du wieder Latzug. Die drei Paare stehen grün als Vorschlag. Du kannst z. B. beim zweiten Satz das Gewicht auf **47,5 kg** ändern und **12 Wiederholungen** übernehmen. Die neuen Satzwerte fließen erst nach dem Eintragen/Übernehmen in deine Statistik.
 
-1. Öffne https://console.firebase.google.com/ und erstelle ein Firebase-Projekt. Wähle den **kostenlosen Spark-Tarif**; keinen kostenpflichtigen Blaze-Tarif, keine Rechnungskontoverknüpfung.
-2. Wähle im Projekt **Authentication → Sign-in method** und aktiviere die Anmeldemethode **Email/Password** (E-Mail/Passwort).
-3. Öffne **Firestore Database → Create database**. Erstelle die **Standard-Datenbank** (`(default)`) in einer für dich geeigneten europäischen Region. Verwende danach sichere Regeln, auch falls beim Erstellen der Testmodus angeboten wird.
-4. Öffne in Firestore den Tab **Rules (Regeln)** und ersetze den gesamten Inhalt durch den Inhalt der mitgelieferten Datei **`firestore.rules`**. Klicke **Publish / Veröffentlichen**. **Das ist sicherheitskritisch.** Ohne diese Regeln solltest du keinerlei Trainingsdaten hochladen.
-5. Öffne **Project settings → General → Your apps**, registriere eine **Web-App** (Symbol `</>`), z. B. `KRAFTLOG`. Kopiere aus der `firebaseConfig` die Werte für `apiKey` und `projectId`.
-6. Öffne in deinem GitHub-Repository **`cloud-config.js` → Edit (Stift)**. Ersetze die leeren Zeichenketten durch deine beiden Werte, etwa so:
+## Hinweise
 
-```js
-window.KRAFTLOG_CLOUD_CONFIG = {
-  apiKey: 'DEIN_FIREBASE_WEB_API_KEY',
-  projectId: 'dein-firebase-projektname'
-};
-```
-
-7. **Commit changes**, lade die GitHub-Pages-App neu. Unter **Profil → Cloud-Synchronisierung** erscheint nun die Online-Anmeldung.
-
-Du darfst nur die **Web-Konfigurationswerte** `apiKey` und `projectId` eintragen. Diese Kennungen sind bei Firebase öffentlich verwendbar, **wenn** die Sicherheitsregeln stimmen. **Niemals** ein Firebase-Dienstkonto, einen Admin-Schlüssel oder private Schlüssel in GitHub hochladen.
-
-**So sehen die Datenbank-Regeln aus (dieselben stehen in `firestore.rules`):**
-
-```
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    match /kraftlog_users/{userId} {
-      allow read, create, update, delete:
-        if request.auth != null && request.auth.uid == userId;
-    }
-    match /{document=**} {
-      allow read, write: if false;
-    }
-  }
-}
-```
-
-## 3. Bestehende Trainingsdaten übernehmen
-
-**Auf dem Handy, auf dem dein Training bisher gespeichert ist:**
-
-1. Öffne unter **derselben GitHub-Pages-Adresse** KRAFTLOG 2.0 und entsperre dein bisheriges lokales Profil. Alle alten Trainingseinträge sollten sofort sichtbar sein.
-2. Gehe auf **Profil → Cloud-Synchronisierung**, gib deine E-Mail und ein Online-Passwort ein und tippe auf **Cloud-Konto erstellen**.
-3. Sobald die Anzeige **„Synchronisiert“** meldet, ist dein bisheriger verschlüsselter Trainingsstand auch online. Spätere Änderungen werden automatisch nach kurzer Zeit synchronisiert, sofern Internet verfügbar ist.
-4. Deine Frau öffnet denselben App-Link auf **ihrem** Handy, erstellt **ihr eigenes lokales Profil** und verbindet es mit **ihrer eigenen E-Mail-Adresse**. Eure Trainingsdaten und Logins bleiben getrennt.
-
-Du hast zwei Passwörter: Das **Profilpasswort** verschlüsselt und entschlüsselt dein Training; das **Online-Passwort** gehört zu Firebase Authentication. Du kannst dasselbe sichere Passwort verwenden, sofern du das möchtest, aber für erhöhte Sicherheit sind unterschiedliche Passwörter besser. **Wenn das Profilpasswort vergessen wird, sind auch die Cloud-Daten nicht entschlüsselbar.**
-
-## 4. Neues Handy, keine Backup-Datei mehr nötig
-
-1. Öffne auf dem neuen Handy dieselbe GitHub-Pages-Adresse.
-2. Unten auf dem Startbildschirm unter **„Online-Profil wiederherstellen“** mit **E-Mail + Online-Passwort** anmelden.
-3. Die App lädt dein verschlüsseltes Profil von Firebase in den lokalen Speicher.
-4. Mit deinem **bisherigen Profilpasswort** entsperren. Alle Einträge und Pläne sind wieder da.
-
-**Synchronisierung beachten:** Ohne Internet kannst du weiterhin lokal trainieren. Die App synchronisiert bei erneuter Verbindung, wenn du sie öffnest oder nach einer Änderung. Bei einem Versionskonflikt (auf zwei Geräten wurde derselbe Stand unterschiedlich bearbeitet) wird **nicht stillschweigend überschrieben**. Unter **Profil** wählst du ausdrücklich, welche Version beibehalten wird. Eine Zusammenführung widersprüchlicher Einträge erfolgt noch nicht automatisch.
-
-## 5. Updates der App – ohne Löschung der Trainingsdaten
-
-- Ändere ausschließlich die **Code-Dateien in GitHub**, nicht die Browserdaten und nicht das gespeicherte Online-Profil.
-- **Behalte die bisherige GitHub-Pages-Adresse und das Firebase-Projekt.** Ein anderer GitHub-Nutzername oder Repositoryname verändert die Webadresse; lokaler Browserspeicher ist origin-gebunden.
-- **Behalte die ausgefüllte `cloud-config.js`** bei späteren Updates. Die mitgelieferte leere Datei darf sie nicht überschreiben.
-- Die lokale Speicherstruktur ist abwärtskompatibel zu KRAFTLOG 1.0.
-- Prüfe nach Änderungen unter **Profil**, ob „Synchronisiert“ erscheint. Wenn nicht, trainierst du zwar weiterhin lokal, aber nicht garantiert cloudgesichert.
-
-## 6. Sicherheit, Grenzen und Kosten
-
-- Die Nutzer-Trainingsdaten liegen **nicht in GitHub**. Das öffentliche Repository enthält die Web-App, die beiden öffentlichen Firebase-Projektkennungen und die Sicherheitsregeln. Firestore speichert nur verschlüsselte Profildaten, die anhand der Benutzer-ID abgeschottet sind.
-- Auf deinem Gerät ist eine Firebase-Anmeldesitzung gespeichert, um nach dem Schließen automatisch weiter synchronisieren zu können. Wer ein bereits entsperrtes Gerät vollständig kontrolliert, könnte auf dortige Daten zugreifen; perfekte Sicherheit gibt es nicht.
-- Die App zeigt die von Firebase gelieferten Anmelde-/Netzwerkfehler an. Eine echt eingerichtete Firebase-Cloud konnte für diese Version nicht mit deinen persönlichen Projektschlüsseln getestet werden, weil diese noch nicht vorliegen. Der komplette Ablauf wurde mit einem simulierten Firebase-Backend erfolgreich getestet.
-- Im Spark-Tarif gibt es Nutzungsgrenzen. Bei privater Nutzung durch zwei Personen ist das üblicherweise ausreichend; Überschreiten der kostenlosen Kontingente oder Änderung der Anbieterbedingungen kann den Dienst einschränken. **Bleibe bei Spark**, wenn du keinesfalls Geld ausgeben willst.
-- Verlust des Profilpassworts = kein Entschlüsseln. Die Cloud ersetzt nicht jede Sicherheitskopie.
-- Nicht alle Browser garantieren dauerhaften lokalen Speicher. Für automatisches Cloud-Backup muss die Synchronisierung tatsächlich erfolgreich sein.
-- Übungen enthalten eigenständige schematische Zeichnungen, keine offiziellen FitX-Gerätefotos.
-- Alle Daten einer Tages-Trainingseinheit werden unter demselben Datum geführt; Volumen = Summe(Gewicht × Wiederholungen) über gültige Sätze. Bei einarmigen/zweihändigen Übungen für Volumenberechnung die erfassten Gewichte sinnvoll einheitlich angeben.
-
-## Technische Hinweise
-
-Statisch gehostet: `index.html`, `app.css`, `app.js`, `cloud-config.js`, `cloud.js`, Offline-Service-Worker. Authentisierung über Firebase Identity Toolkit REST; Daten über Cloud Firestore REST mit privaten Sicherheitsregeln. Die Firestore-Schreiboperation verwendet eine `updateTime`-Vorbedingung, um fremde Änderungen nicht unbemerkt zu überschreiben. Clientseitige Verschlüsselung: Web Crypto AES-GCM, PBKDF2 SHA-256 mit 240.000 Iterationen. Lokal unveränderte Profil-Storage-Key-Version `kraftlog.profiles.v1`.
-
-KRAFTLOG ist kein offizielles Produkt von FitX.
+Version 2.1 wurde anhand von simulierten Nutzerinteraktionen im mobilen Chromium geprüft: Übernahme pro Feld, pro Satz und aller Sätze, keine Überschreibung eigener Gewichte, Volumenberechnung und Wiederöffnung eines verschlüsselten Profils. Der Browsertest verwendet simulierte Kryptografie und keinen echten Firebase-Server; die bestehende Verschlüsselungs- und Cloud-Implementierung wurde nicht verändert. Die Veröffentlichung und der Cloud-Abgleich in deinem eigenen GitHub-/Firebase-Konto wurden nicht ausgeführt.

@@ -111,3 +111,45 @@ a{color:var(--accent)}
 .timer-presets{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}.timer-cycle-row{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;margin:10px 0}.timer-check{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);font-weight:700}
 @media(min-width:650px){.badge-grid{grid-template-columns:repeat(5,minmax(0,1fr))}.mission-list{grid-template-columns:repeat(3,minmax(0,1fr))}.collection-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.timer-dock{bottom:30px;right:18px}}
 @media(min-width:900px){.timer-dock{bottom:26px;right:26px}}
+
+/* KRAFTLOG 4.0 – warmer brown modern refresh */
+:root{--bg:#f7efe7;--bg-soft:#efe4d7;--panel:#fffaf5;--panel2:#f4eadf;--border:#dbc7b2;--text:#36281f;--muted:#786859;--accent:#8a6247;--accent-ink:#fff9f4;--shadow:0 18px 46px rgba(99,72,49,.12)}
+body{background:radial-gradient(circle at 15% 0%,rgba(173,140,106,.18),transparent 28%),radial-gradient(circle at 95% 12%,rgba(119,92,70,.12),transparent 28%),linear-gradient(180deg,#fbf6f0 0%,#f0e5d8 100%)}
+.hero{background:linear-gradient(135deg,#7b5a45,#5b4335 60%,#453229);color:#fff8f0;border-color:#86664f;position:relative}
+.hero:before{content:"";position:absolute;left:-40px;bottom:-55px;width:180px;height:120px;background:rgba(255,255,255,.05);border-radius:52% 48% 55% 45%/60% 40% 60% 40%}
+.hero:after{border-color:rgba(255,255,255,.12)}
+.hero p,.hero .stat-pill{color:#f4e7db}.stat-pill{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.14)}.stat-pill strong{color:#fff6ef}
+.ex-art,.library-art{background:#f1e6da;border-color:#d9c7b3}
+.cardio-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.cardio-card .ex-history{background:#f7f0e6;color:#6e5a48;border-color:#e3d1bc}
+.cardio-card .ex-history strong{color:#4e3c2f}
+.item-badge,.badge-code{display:inline-flex;align-items:center;justify-content:center;min-width:40px;height:40px;padding:0 10px;border-radius:14px;background:#ede0d0;color:#6a4e3b;border:1px solid #d8c1a7;font-size:12px;font-weight:900;letter-spacing:.5px}
+.item-common{background:#efe2d2}.item-rare{background:#f6e7cc;border-color:#ddbf87;color:#7a592c}.item-epic{background:#efe1f4;border-color:#c2a4d7;color:#6a4582}
+.collection-item .tiny{font-weight:800;color:#7b654f}
+.collection-item .grow{display:flex;flex-direction:column;align-items:flex-start}
+.mission-card,.badge-card,.metric-card{background:#fffdf9}
+.badge-card{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:126px}
+.badge-card .badge-code{margin-bottom:6px}
+.mini-gym-canvas{position:relative;height:340px;border-radius:30px;overflow:hidden;border:1px solid #dbc6b2;background:linear-gradient(180deg,#f8f2eb,#efe4d8);box-shadow:inset 0 1px 0 rgba(255,255,255,.6)}
+.mini-gym-upper,.mini-gym-lower,.mini-gym-outdoor{position:absolute;border-radius:24px}
+.mini-gym-upper{left:18px;right:118px;top:18px;bottom:160px;background:rgba(255,255,255,.34);border:1px solid rgba(255,255,255,.4)}
+.mini-gym-lower{left:18px;right:118px;top:170px;bottom:18px;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.36)}
+.mini-gym-outdoor{top:18px;right:18px;bottom:18px;width:84px;background:rgba(255,255,255,.16);border:1px dashed rgba(255,255,255,.55)}
+.mini-gym-canvas.wall-sand{background:linear-gradient(180deg,#f5ece2,#eadbcb)}
+.mini-gym-canvas.wall-travertine{background:linear-gradient(180deg,#efe4d4,#e4d1bc)}
+.mini-gym-canvas.wall-clay{background:linear-gradient(180deg,#eed9ca,#dfc1ae)}
+.mini-gym-canvas.wall-graphite{background:linear-gradient(180deg,#d8d0ca,#c5bbb2)}
+.mini-gym-canvas.floor-walnut .mini-gym-lower,.mini-gym-canvas.floor-walnut .mini-gym-upper{box-shadow:inset 0 -999px 0 rgba(146,101,73,.13)}
+.mini-gym-canvas.floor-oak .mini-gym-lower,.mini-gym-canvas.floor-oak .mini-gym-upper{box-shadow:inset 0 -999px 0 rgba(184,146,96,.12)}
+.mini-gym-canvas.floor-stone .mini-gym-lower,.mini-gym-canvas.floor-stone .mini-gym-upper{box-shadow:inset 0 -999px 0 rgba(172,160,145,.16)}
+.mini-gym-canvas.floor-cream .mini-gym-lower,.mini-gym-canvas.floor-cream .mini-gym-upper{box-shadow:inset 0 -999px 0 rgba(239,230,215,.2)}
+.mini-gym-canvas.scene-courtyard .mini-gym-outdoor{background:linear-gradient(180deg,rgba(179,199,174,.5),rgba(144,176,140,.38))}
+.mini-gym-canvas.scene-studio .mini-gym-outdoor{background:linear-gradient(180deg,rgba(219,203,184,.45),rgba(201,182,160,.28))}
+.mini-gym-canvas.scene-terrace .mini-gym-outdoor{background:linear-gradient(180deg,rgba(205,188,164,.4),rgba(181,159,131,.3))}
+.mini-slot{position:absolute;display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;gap:6px;padding:10px;border-radius:18px;border:1px solid rgba(119,95,75,.16);background:rgba(255,250,244,.88);backdrop-filter:blur(6px);text-align:left;color:var(--text)}
+.mini-slot.empty-slot{background:rgba(255,255,255,.36);border-style:dashed;color:#927f6f}
+.mini-slot small{font-size:10px;line-height:1.2;color:#6f5a49}
+.slot-label{font-size:11px;font-weight:800;color:#8b7867}
+.pos-1{left:36px;top:44px;width:116px;min-height:68px}.pos-2{left:168px;top:50px;width:116px;min-height:68px}.pos-3{left:300px;top:46px;width:116px;min-height:68px}.pos-4{left:82px;top:120px;width:126px;min-height:74px}.pos-5{left:238px;top:120px;width:126px;min-height:74px}.pos-6{left:44px;top:208px;width:116px;min-height:68px}.pos-7{left:176px;top:220px;width:116px;min-height:68px}.pos-8{left:308px;top:218px;width:116px;min-height:68px}.pos-9{right:28px;top:62px;width:64px;min-height:86px}.pos-10{right:28px;top:182px;width:64px;min-height:96px}
+@media(max-width:520px){.mini-gym-canvas{height:380px}.mini-gym-upper,.mini-gym-lower{right:18px}.mini-gym-outdoor{display:none}.pos-1{left:18px;top:30px;width:44%}.pos-2{right:18px;left:auto;top:30px;width:44%}.pos-3{left:18px;top:106px;width:44%}.pos-4{right:18px;left:auto;top:106px;width:44%}.pos-5{left:18px;top:186px;width:44%}.pos-6{right:18px;left:auto;top:186px;width:44%}.pos-7{left:18px;top:266px;width:44%}.pos-8{right:18px;left:auto;top:266px;width:44%}.pos-9{left:18px;top:336px;width:44%}.pos-10{right:18px;left:auto;top:336px;width:44%}}
+.btn-ghost,.chip{background:#f6eee4;color:#6f5a49}.chip.active{background:#8a6247;border-color:#8a6247;color:#fff8f2}
