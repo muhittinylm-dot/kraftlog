@@ -179,3 +179,24 @@ body{background:radial-gradient(circle at 15% 0%,rgba(173,140,106,.18),transpare
 .mini-slot small{display:block;max-width:100%;white-space:normal}
 .nav-button span{white-space:nowrap}
 @media(max-width:420px){.nav-button{padding:5px 2px;font-size:9px}.nav-button svg{width:19px;height:19px}.collection-visual{width:66px;height:58px}}
+
+/* KRAFTLOG 5.1: Cardio-Eingabe, Vorwerte und Pace */
+.cardio-card .cardio-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:14px 0 8px}
+.cardio-card .set-col{display:flex;flex-direction:column;min-width:0}
+.cardio-card .set-col label{font-size:11px;letter-spacing:.075em;color:#785e4a;font-weight:800;margin-bottom:5px}
+.cardio-card .set-col .input{font-variant-numeric:tabular-nums;max-width:100%;box-sizing:border-box}
+.cardio-card .set-col [aria-invalid="true"]{border-color:#bd7365;box-shadow:0 0 0 2px rgba(189,115,101,.13)}
+.cardio-card .cardio-field-suggestion{margin:6px 0 0;min-height:26px}
+.cardio-card .cardio-suggest{padding:6px 8px;background:#f0e4d6;color:#73553f;border:1px solid #deccb6;border-radius:10px;font-size:11px;line-height:1.2;cursor:pointer;text-align:left;max-width:100%;font-weight:650}
+.cardio-card .cardio-suggest:active{background:#e5d1bf}
+.cardio-metrics{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:12px 0}
+.cardio-metrics>div{background:#f1e7dc;border:1px solid #e0cfbf;border-radius:15px;padding:12px;display:flex;align-items:baseline;gap:5px;flex-wrap:wrap}
+.cardio-metrics span{display:block;width:100%;font-size:10px;letter-spacing:.095em;font-weight:800;color:#856a54}
+.cardio-metrics strong{font-size:26px;line-height:1.2;color:#4c3527;font-weight:850;font-variant-numeric:tabular-nums}
+.cardio-metrics small{font-size:11px;color:#836c5b}
+.cardio-footer{display:block}
+.cardio-footer #cardio-save{color:#6d8b65;font-size:11px;font-weight:700}
+.cardio-completion{border-top:1px solid #e6d7c6;padding-top:14px;margin-top:12px}
+.cardio-completion>.small{margin-bottom:9px;font-weight:700}
+.cardio-completion>p{margin:9px 0 0;line-height:1.45}
+@media(min-width:540px){.cardio-card .cardio-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
