@@ -1,4 +1,4 @@
-/* KRAFTLOG 5.1 – zuverlaessige Cardio-Speicherung, Vorwerte, Pace und sichere Abschlusslogik. */
+/* KRAFTLOG 6.0 – interaktive isometrische Mini-Welt; Cardio 5.1 und Kraft bleiben erhalten. */
 'use strict';
 const STORE = 'kraftlog.profiles.v1';
 
@@ -89,33 +89,7 @@ const EXERCISE_TIPS = {
  laufen:'Erfasse Dauer, Distanz und Kalorien für deinen Lauf.',
  radfahren:'Erfasse Dauer, Distanz und Kalorien für deine Radtour.'
 };
-function buildBoosterItems(){
- const tints=['walnut','sand','clay','olive','stone','ivory','graphite','blush','teal','amber'];
- const defs=[
-  ['Möbel','chair',['Lounge Chair','Accent Chair','Dining Chair','Reading Chair','Studio Stool','Bar Stool','Club Chair','Curved Chair','Ottoman Chair','Window Chair']],
-  ['Möbel','table',['Coffee Table','Side Table','Dining Table','Console Table','Display Table','Round Table','Stone Table','Low Table','Study Table','Terrace Table']],
-  ['Wohnbereich','sofa',['Compact Sofa','Corner Sofa','Bench Sofa','Daybed Sofa','Reading Bench','Modular Sofa','Sleeper Sofa','Loveseat','Ottoman Sofa','Window Bench']],
-  ['Schlafbereich','bed',['Platform Bed','Canopy Bed','Guest Bed','Travertine Bed','Walnut Bed','Studio Bed','Daybed','Loft Bed','Storage Bed','Soft Bed']],
-  ['Arbeitsbereich','desk',['Writing Desk','Studio Desk','Make-up Desk','Reading Desk','Work Nook','Shelf Desk','Window Desk','Oak Desk','Travertine Desk','Compact Desk']],
-  ['Licht & Deko','lamp',['Floor Lamp','Pendant Lamp','Wall Lamp','Table Lamp','Arch Lamp','Lantern Lamp','Desk Lamp','Sculptural Lamp','Bedside Lamp','Accent Lamp']],
-  ['Pflanzen','plant',['Olive Tree','Monstera','Ficus','Palm','Snake Plant','Bonsai','Pampas Pot','Hanging Plant','Fig Tree','Terrace Plant']],
-  ['Haustiere','pet',['House Cat','Golden Retriever','French Bulldog','Rabbit','Maine Coon','Shiba','British Cat','Parrot','Turtle','Toy Poodle']],
-  ['Außenbereich','outdoor',['Pergola','Outdoor Bench','Sun Lounger','Fire Bowl','Fountain','Planter Box','Garden Chair','Terrace Bench','Outdoor Table','Garden Pot']],
-  ['Gym','equipment',['Dumbbell Rack','Half Rack','Cable Tower','Workout Bench','Treadmill','Bike','Rower','Kettlebell Rack','Stretch Station','Pilates Bench']]
- ];
- const items=[];
- let id=1;
- defs.forEach(([category,kind,names],seriesIndex)=>{
-   names.forEach((baseName,i)=>{
-     const tint=tints[(seriesIndex+i)%tints.length];
-     const prefix=['Walnut','Travertine','Sand','Clay','Olive','Stone','Ivory','Graphite','Blush','Amber'][(i+seriesIndex*2)%10];
-     items.push({id:`item-${String(id).padStart(3,'0')}`,name:`${prefix} ${baseName}`,category,kind,tint});
-     id++;
-   });
- });
- return items.slice(0,100);
-}
-const BOOSTER_ITEMS = buildBoosterItems();
+const BOOSTER_ITEMS = window.KraftlogMiniGym.catalog;
 const BASE_PLANS = [
   {id:'plan-ganz', name:'Ganzkörper', exerciseIds:['beinpresse','latzug','brustpresse','rudern','schulterpresse','bauchmaschine']},
   {id:'plan-push', name:'Push · Brust & Trizeps', exerciseIds:['brustpresse','schraegpresse','butterfly','schulterpresse','seitheben','trizepsdruecken']},
@@ -133,9 +107,9 @@ const shortDate = d=>new Intl.DateTimeFormat('de-DE',{day:'2-digit',month:'2-dig
 const longDate = d=>new Intl.DateTimeFormat('de-DE',{weekday:'long',day:'numeric',month:'long',year:'numeric'}).format(new Date(d+'T12:00:00'));
 function localDate(dt=new Date()){return `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`;}
 function dateShift(date,n){let d=new Date(date+'T12:00:00');d.setDate(d.getDate()+n);return localDate(d);}
-const baseData=()=>({version:5,plans:BASE_PLANS.map(p=>({...p,exerciseIds:[...p.exerciseIds]})),customExercises:[],sessions:[],inventory:[],equippedItems:[],gymLayout:Array(10).fill(null),gymDesign:{wall:'sand',floor:'walnut',scene:'courtyard'}});
+const baseData=()=>({version:6,plans:BASE_PLANS.map(p=>({...p,exerciseIds:[...p.exerciseIds]})),customExercises:[],sessions:[],inventory:[],equippedItems:[],gymLayout:Array(10).fill(null),gymDesign:{wall:'sand',floor:'walnut',scene:'courtyard'},gymWorld:{version:1,items:[]}});
 let accounts=[],currentId=null,currentKey=null,data=null,activeTab='today',selectedDate=localDate();
-let libraryGroup='Alle',libraryQuery='',statExercise='latzug',statMetric='volume',modal=null,authMode='new',saveQueue=Promise.resolve(),toastTimer=null,appError='',gymSelectedItemId=null;
+let libraryGroup='Alle',libraryQuery='',statExercise='latzug',statMetric='volume',modal=null,authMode='new',saveQueue=Promise.resolve(),toastTimer=null,appError='',gymSelectedItemId=null,gymFocusedPlacedId=null;
 let cloudStatus='Noch nicht verbunden',cloudConflict=false,cloudBusy=false,cloudDebounce=null,cloudNeedsRerun=false,localMutationSeq=0;
 const TIMER_STORE='kraftlog.timer.v1';
 const TIMER_PRESETS=[30,60,90,120,150,180];
@@ -229,7 +203,8 @@ function normalizeDataShape(obj){
  if(!obj.gymDesign||typeof obj.gymDesign!=='object')obj.gymDesign={wall:'sand',floor:'walnut',scene:'courtyard'};
  obj.gymLayout=(obj.gymLayout.concat(Array(10).fill(null))).slice(0,10);
  if(obj.equippedItems.length)obj.equippedItems.slice(0,10).forEach((id,i)=>{if(!obj.gymLayout[i])obj.gymLayout[i]=id;});
- obj.version=5;
+ obj.version=6;
+ window.KraftlogMiniGym.normalizeWorld(obj);
  obj.sessions.forEach(s=>{
    if(!Array.isArray(s.exercises))s.exercises=[];
    if(typeof s.planId==='undefined')s.planId=null;
@@ -246,39 +221,34 @@ function normalizeDataShape(obj){
 }
 function completedSessions(){return (data?.sessions||[]).filter(s=>s.exercises.some(entryCompleted)).sort((a,b)=>a.date.localeCompare(b.date));}
 function sessionProgress(s){const total=s?.exercises?.length||0,completed=(s?.exercises||[]).filter(entryCompleted).length;return {total,completed,done:total>0&&completed===total};}
-function boosterItem(id){return BOOSTER_ITEMS.find(x=>x.id===id)||{id,name:id,category:'Objekt',kind:'chair',tint:'walnut'};}
+function boosterItem(id){return BOOSTER_ITEMS.find(x=>x.id===id)||{id,name:id,category:'Objekt',kind:'chair',color:'#9b816d'};}
 function uniqueInventoryIds(){return [...new Set(data?.inventory||[])];}
 function collectionCount(id){return (data?.inventory||[]).filter(x=>x===id).length;}
 function drawBoosterItems(n=1){
- const picks=[];
  const unlocked=new Set(data?.inventory||[]);
- let available=BOOSTER_ITEMS.filter(x=>!unlocked.has(x.id));
- while(picks.length<n){
-   const pool=available.length?available:BOOSTER_ITEMS.filter(x=>!picks.some(p=>p.id===x.id));
-   const pick=pool[Math.floor(Math.random()*pool.length)]||BOOSTER_ITEMS[0];
-   picks.push(pick);
-   available=available.filter(x=>x.id!==pick.id);
- }
- return picks;
+ const pool=BOOSTER_ITEMS.filter(item=>!unlocked.has(item.id));
+ if(!pool.length)return [];
+ const chosen=pool[Math.floor(Math.random()*pool.length)];
+ return [chosen]; // Nur ein Item, keine Duplikate, bis 100/100 erreicht sind.
 }
-function placedItemIds(){return (data?.gymLayout||[]).filter(Boolean);}
+function placedItemIds(){return (data?.gymWorld?.items||[]).map(x=>x.id);}
 function placeItemInGym(id){data.gymLayout=data.gymLayout||Array(10).fill(null);if(data.gymLayout.includes(id))return true;const slot=data.gymLayout.findIndex(x=>!x);if(slot<0)return false;data.gymLayout[slot]=id;return true;}
 function placeItemAtSlot(id,slot){data.gymLayout=(data.gymLayout||Array(10).fill(null)).slice(0,10);if(slot<0||slot>=data.gymLayout.length)return false;const prev=data.gymLayout.indexOf(id);if(prev>=0)data.gymLayout[prev]=null;data.gymLayout[slot]=id;return true;}
 function removePlacedItemFromGym(id){data.gymLayout=(data.gymLayout||Array(10).fill(null)).map(x=>x===id?null:x);}
 function maybeUnlockBooster(s=session()){
- if(!s)return false;
- const prog=sessionProgress(s);
- if(!prog.done||s.boosterPack?.items?.length)return false;
- const items=drawBoosterItems(1).map(x=>x.id);
- s.boosterPack={date:s.date,items,openedAt:new Date().toISOString()};
- data.inventory.push(...items);
- placeItemInGym(items[0]);
+ if(!s||s.boosterPack)return false;
+ const progress=sessionProgress(s);
+ if(!progress.done)return false;
+ const item=drawBoosterItems(1)[0];
+ s.boosterPack={date:s.date,items:item?[item.id]:[],complete:!item,openedAt:new Date().toISOString()};
+ if(item)data.inventory.push(item.id);
  s.updatedAt=new Date().toISOString();
  save();
- modal={type:'booster',date:s.date,itemIds:items};
- toast('Booster-Pack freigeschaltet');
- return true;
+ if(item){modal={type:'booster',date:s.date,itemIds:[item.id]};toast('Neues Mini-Gym-Objekt freigeschaltet');}
+ else toast('Alle 100 Mini-Gym-Objekte gesammelt');
+ return Boolean(item);
 }
+
 function startOfWeek(dateStr=localDate()){
  const d=new Date(dateStr+'T12:00:00');
  const day=(d.getDay()+6)%7;
@@ -370,23 +340,29 @@ function itemArtwork(item,variant='card'){
  })(item.kind);
  return `<div class="object-thumb ${cls} kind-${escapeHTML(item.kind)} tint-${escapeHTML(item.tint)}" style="--thumb-main:${c.main};--thumb-dark:${c.dark};--thumb-light:${c.light};--thumb-bg:${c.bg};border-color:${stroke}">${svg}</div>`;
 }
-function renderBoosterItems(itemIds){return `<div class="booster-items">${itemIds.map(id=>{const item=boosterItem(id);return `<div class="loot-card">${itemArtwork(item,'booster')}<strong>${escapeHTML(item.name)}</strong><small>${escapeHTML(item.category)}</small></div>`;}).join('')}</div>`;}
+function renderBoosterItems(itemIds){return `<div class="booster-items">${itemIds.map(id=>{const item=boosterItem(id);return `<div class="loot-card modern-loot"><img alt="${escapeHTML(item.name)}" src="${window.KraftlogMiniGym.thumbnail(id)}" class="loot-thumb"><strong>${escapeHTML(item.name)}</strong><small>${escapeHTML(item.category)} · Neu in deiner Sammlung</small></div>`;}).join('')}</div>`;}
 function renderBoosterStatus(s){
- if(!s||!s.exercises.length)return `<div class="card booster-status"><div class="row between"><div><strong>Booster-Pack</strong><p class="intro">Wähle einen Plan oder füge Übungen hinzu. Sobald jede geplante Übung mindestens einen Eintrag hat, schaltest du ein Pack mit genau einem neuen Objekt frei.</p></div><span class="status-chip">0/0</span></div></div>`;
- const prog=sessionProgress(s),pct=prog.total?Math.round(prog.completed/prog.total*100):0;
- if(s.boosterPack?.items?.length)return `<div class="card booster-status unlocked"><div class="row between"><div><strong>Booster-Pack freigeschaltet</strong><p class="intro">Dein Training für ${shortDate(s.date)} ist vollständig. Ein neues Objekt wartet auf dich.</p></div><span class="status-chip">${prog.completed}/${prog.total}</span></div><div class="progress-bar"><span id="booster-progress-fill" style="width:100%"></span></div><div class="btn-wrap" style="margin-top:12px"><button class="btn btn-primary" data-action="open-session-booster">Pack öffnen</button><button class="btn btn-ghost" data-action="booster-to-stats">Mini-Gym öffnen</button></div></div>`;
- return `<div class="card booster-status"><div class="row between"><div><strong>Booster-Pack</strong><p class="intro">Jede geplante Übung oder Cardio-Einheit muss für diesen Tag mindestens einmal erfasst sein.</p></div><span class="status-chip" id="booster-count">${prog.completed}/${prog.total}</span></div><div class="progress-bar"><span id="booster-progress-fill" style="width:${pct}%"></span></div><div class="small muted" id="booster-note">${prog.completed} von ${prog.total} Einträgen vollständig</div></div>`;
+ if(!s||!s.exercises.length)return `<div class="card booster-status"><div class="row between"><div><strong>Dein nächstes Booster-Pack</strong><p class="intro">Tracke die letzte geplante Übung vollständig, um ein neues Objekt für deine Mini-Welt freizuschalten.</p></div><span class="status-chip">0/0</span></div></div>`;
+ const progress=sessionProgress(s),pct=Math.round(100*progress.completed/progress.total);
+ if(s.boosterPack?.complete)return `<div class="card booster-status unlocked"><strong>Sammlung komplett!</strong><p class="intro">Alle 100 Gegenstände sind bereits freigeschaltet.</p></div>`;
+ if(s.boosterPack?.items?.length)return `<div class="card booster-status unlocked"><div class="row between"><div><strong>Booster-Pack freigeschaltet</strong><p class="intro">Ein neues Objekt wartet in deiner Sammlung. Du kannst es jederzeit frei in deinem Mini-Gym platzieren.</p></div><span class="status-chip">${progress.completed}/${progress.total}</span></div><div class="progress-bar"><span id="booster-progress-fill" style="width:100%"></span></div><div class="btn-wrap" style="margin-top:12px"><button class="btn btn-primary" data-action="open-session-booster">Pack ansehen</button><button class="btn btn-ghost" data-action="booster-to-stats">Zur Mini-Welt</button></div></div>`;
+ return `<div class="card booster-status"><div class="row between"><div><strong>Dein nächstes Booster-Pack</strong><p class="intro">Eine Belohnung pro vollständigem Trainingstag – ohne Seltenheitsstufen und ohne Duplikate.</p></div><span class="status-chip" id="booster-count">${progress.completed}/${progress.total}</span></div><div class="progress-bar"><span id="booster-progress-fill" style="width:${pct}%"></span></div><div class="small muted" id="booster-note">${progress.completed} von ${progress.total} Übungen vollständig</div></div>`;
 }
 function renderMiniGym(){
- data.gymLayout=(data.gymLayout||Array(10).fill(null)).slice(0,10);
- const wall=data.gymDesign?.wall||'sand',floor=data.gymDesign?.floor||'walnut',scene=data.gymDesign?.scene||'courtyard';
- const wallOptions=[['sand','Sand'],['travertine','Travertin'],['clay','Clay'],['graphite','Graphit']];
- const floorOptions=[['walnut','Walnut'],['oak','Oak'],['stone','Stone'],['cream','Cream']];
- const sceneOptions=[['courtyard','Innenhof'],['studio','Studio'],['terrace','Terrasse']];
- const unlocked=uniqueInventoryIds();
- return `<div class="card"><div class="row between" style="margin-bottom:10px"><div><strong>Mini-Gym</strong><div class="small muted">Wähle ein freigeschaltetes Objekt aus und tippe dann auf einen Platz im Raum.</div></div><span class="status-chip">${placedItemIds().length}/10 platziert</span></div><div class="gym-helper ${gymSelectedItemId?'active':''}">${gymSelectedItemId?`Ausgewählt: <strong>${escapeHTML(boosterItem(gymSelectedItemId).name)}</strong> – jetzt einen Platz antippen.`:'Tipp: Objekt in der Sammlung auswählen, danach im Raum platzieren. Tippe auf ein platziertes Objekt ohne Auswahl, um es zu entfernen.'}</div><div class="mini-gym-canvas wall-${wall} floor-${floor} scene-${scene}"><div class="mini-gym-upper"></div><div class="mini-gym-lower"></div><div class="mini-gym-outdoor"></div><div class="mini-floor-lines"></div>${data.gymLayout.map((id,i)=>{const item=id?boosterItem(id):null;return `<button class="mini-slot pos-${i+1} ${item?'filled':'empty-slot'} ${gymSelectedItemId&&(!item||gymSelectedItemId!==id)?'can-place':''}" data-action="gym-slot" data-slot="${i}" title="${item?escapeHTML(item.name):'Freier Platz'}">${item?`${itemArtwork(item,'slot')}<small>${escapeHTML(item.name)}</small>`:`<span class="slot-label">Platz ${i+1}</span>`}</button>`;}).join('')}</div><div class="stack" style="margin-top:14px"><div><div class="small muted" style="margin-bottom:8px">Wand</div><div class="filters">${wallOptions.map(([id,label])=>`<button class="chip ${wall===id?'active':''}" data-action="set-wall" data-value="${id}">${label}</button>`).join('')}</div></div><div><div class="small muted" style="margin-bottom:8px">Boden</div><div class="filters">${floorOptions.map(([id,label])=>`<button class="chip ${floor===id?'active':''}" data-action="set-floor" data-value="${id}">${label}</button>`).join('')}</div></div><div><div class="small muted" style="margin-bottom:8px">Szene</div><div class="filters">${sceneOptions.map(([id,label])=>`<button class="chip ${scene===id?'active':''}" data-action="set-scene" data-value="${id}">${label}</button>`).join('')}</div></div></div><div class="section-header"><h3>Sammlung</h3><span class="subtitle">${unlocked.length} / 100 freigeschaltet</span></div><div class="collection-grid">${unlocked.map(id=>{const item=boosterItem(id),placed=(data.gymLayout||[]).includes(id),selected=gymSelectedItemId===id;return `<button class="collection-item ${placed?'equipped':''} ${selected?'selected':''}" data-action="select-item" data-item="${escapeHTML(id)}">${itemArtwork(item,'card')}<span class="grow"><strong>${escapeHTML(item.name)}</strong><small>${escapeHTML(item.category)}</small></span><span class="tiny">${selected?'Ausgewählt':placed?'Im Raum':'Auswählen'}</span></button>`;}).join('')||'<div class="empty"><p>Noch keine Gegenstände gesammelt.</p></div>'}</div></div>`;
+ window.KraftlogMiniGym.normalizeWorld(data);
+ const design=data.gymDesign||{}, placed=placedItemIds(), unlocked=uniqueInventoryIds(), selected=gymSelectedItemId;
+ const wallOptions=[['sand','Sand'],['travertine','Travertin'],['clay','Ton'],['terra','Terrakotta'],['greige','Greige'],['graphite','Steingrau']];
+ const floorOptions=[['walnut','Walnuss'],['oak','Eiche'],['travertine','Travertin'],['stone','Naturstein'],['cream','Cremefliesen']];
+ const sceneOptions=[['courtyard','Innenhof'],['terrace','Terrasse'],['studio','Studio']];
+ const chips=(options,action,current)=>options.map(([id,label])=>`<button class="chip ${current===id?'active':''}" data-action="${action}" data-value="${id}">${label}</button>`).join('');
+ return `<div class="mini-world-layout"><div class="mini-world-board"><div class="mini-world-title"><div><span class="eyebrow">DEINE WELT</span><h3>Das Studio</h3></div><span class="status-chip" id="gym-space-count">${placed.length} / 10 Objekte</span></div>
+ <div class="mini-world-frame"><canvas id="mini-world-canvas" width="960" height="690" role="img" aria-label="Interaktive isometrische Miniaturwelt. Ziehe die Gegenstände mit einem Finger."></canvas><div class="mini-world-help">${selected?`Objekt gewählt: <strong>${escapeHTML(boosterItem(selected).name)}</strong>. Tippe in den Raum oder ziehe dort mit dem Finger.`:'Gegenstände im Raum mit dem Finger verschieben. Neues Objekt unten auswählen.'}</div></div>
+ <div class="mini-world-actions"><button class="btn btn-small" data-action="gym-reset-select">Auswahl aufheben</button><button class="btn btn-small" data-action="gym-remove-selected" id="mini-world-remove" ${gymFocusedPlacedId?'':'disabled'}>Gegenstand entfernen</button></div></div>
+ <div class="card mini-world-design"><div class="section-header"><h3>Raumgestaltung</h3></div><div class="mini-design-row"><span class="small muted">Wände</span><div class="filters">${chips(wallOptions,'set-wall',design.wall||'sand')}</div></div><div class="mini-design-row"><span class="small muted">Fußboden</span><div class="filters">${chips(floorOptions,'set-floor',design.floor||'walnut')}</div></div><div class="mini-design-row"><span class="small muted">Außenbereich</span><div class="filters">${chips(sceneOptions,'set-scene',design.scene||'courtyard')}</div></div></div>
+ <div class="card mini-world-collection"><div class="section-header"><h3>Deine Sammlung</h3><span class="subtitle">${unlocked.length} / 100 entdeckt</span></div><p class="intro">Alle 100 Objekte sind individuell gezeichnet. Freigeschaltete Gegenstände bleiben erhalten, auch wenn du sie wieder aus dem Raum entfernst.</p><div class="mini-inventory-grid">${unlocked.map(id=>{const item=boosterItem(id),isPlaced=placed.includes(id);return `<button class="mini-inventory-item ${selected===id?'selected':''}" data-action="gym-choose-item" data-item="${id}" aria-pressed="${selected===id?'true':'false'}"><img src="${window.KraftlogMiniGym.thumbnail(id)}" alt="${escapeHTML(item.name)}"><strong>${escapeHTML(item.name)}</strong><small>${isPlaced?'Bereits im Raum':escapeHTML(item.category)}</small></button>`;}).join('')||`<div class="mini-collection-empty"><strong>Dein erstes Möbelstück wartet</strong><p>Nach deinem nächsten vollständigen Training erhältst du einen neuen Gegenstand.</p></div>`}</div></div></div>`;
 }
-function renderGym(){const unlocked=uniqueInventoryIds().length;return `<div class="section-header"><div><h2>Mini-Gym</h2><p class="intro">Baue dein eigenes Miniatur-Studio im warmen, modernen Stil aus. Jedes Training schaltet genau ein neues Objekt frei.</p></div></div><div class="hero" style="margin-bottom:14px"><div class="hero-footer"><span class="stat-pill"><strong>${unlocked}</strong> von 100 freigeschaltet</span><span class="stat-pill"><strong>${placedItemIds().length}</strong> platziert</span><span class="stat-pill"><strong>${completedSessions().length}</strong> abgeschlossene Trainings</span></div><p class="small" style="margin-top:12px;color:#f4e7db">Orientierung: wohnliches Home-Gym mit Deko, Möbeln, Pflanzen, Haustieren und Außenbereich.</p></div>${renderMiniGym()}`;}
+function renderGym(){const unlocked=uniqueInventoryIds().length;return `<div class="section-header"><div><h2>Mini-Gym</h2><p class="intro">Dein persönliches Architektur-Diorama. Mit echten verschiebbaren Gegenständen, warmen Materialien und einer eigenen kleinen Außenwelt.</p></div></div><div class="gym-banner"><span>${unlocked} / 100 Objekte entdeckt</span><span>${placedItemIds().length} / 10 platziert</span><span>1 Pack je Workout</span></div>${renderMiniGym()}`;}
+
 function syncBoosterStatus(){const s=session(),chip=el('booster-count'),bar=el('booster-progress-fill'),note=el('booster-note');if(!s||!chip||!bar||!note)return;const prog=sessionProgress(s),pct=prog.total?Math.round(prog.completed/prog.total*100):0;chip.textContent=`${prog.completed}/${prog.total}`;bar.style.width=`${pct}%`;note.textContent=`${prog.completed} von ${prog.total} Einträgen vollständig`;}
 
 function loadTimerState(){
@@ -459,7 +435,7 @@ function art(type){
 function artBox(ex,small=false){return `<div class="ex-art ${small?'mini':''}">${art(ex.art)}</div>`;}
 function svgIcon(name){const paths={home:'<path d="m3 10 9-7 9 7v10H3z"/><path d="M9 20v-7h6v7"/>',exercise:'<path d="M5 8v8M8 6v12M16 6v12M19 8v8M8 12h8"/>',plans:'<rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 9h8M8 13h8M8 17h5"/>',stats:'<path d="M4 20V4M4 20h17M7 16l4-5 3 2 6-8"/>',user:'<circle cx="12" cy="8" r="4"/><path d="M4 20c0-5 3-7 8-7s8 2 8 7"/>'};return `<svg viewBox="0 0 24 24" aria-hidden="true">${paths[name]||paths.home}</svg>`;}
 
-function render(){el('app').innerHTML=!currentId?renderAuth():renderShell();renderModal();requestAnimationFrame(()=>{updateTimerUI();syncBoosterStatus();});}
+function render(){el('app').innerHTML=!currentId?renderAuth():renderShell();renderModal();requestAnimationFrame(()=>{updateTimerUI();syncBoosterStatus();if(currentId&&activeTab==='gym'){window.KraftlogMiniGym.mount(el('mini-world-canvas'),data,()=>{save();},gymSelectedItemId,(type,id)=>{if(type==='max')toast('Maximal zehn Gegenstände gleichzeitig. Entferne zuerst einen.');if(type==='selected'){gymFocusedPlacedId=id;const remove=el('mini-world-remove');if(remove)remove.disabled=false;}if(type==='placed'){gymSelectedItemId=null;gymFocusedPlacedId=null;render();}});}});}
 function isLinked(){const rec=accounts.find(a=>a.id===currentId);return !!(rec?.cloudUid && KraftlogCloud.loggedIn() && rec.cloudUid===KraftlogCloud.uid());}
 function setCloudStatus(message){cloudStatus=message;const target=el('cloud-status');if(target)target.textContent=message;}
 function cloudMessage(){
@@ -561,7 +537,7 @@ async function changeProfilePassword(currentPassword,newPassword){
 
 function modalMarkup(title,body,foot=''){return `<div class="overlay" id="overlay" role="presentation"><section class="sheet" role="dialog" aria-modal="true" aria-label="${escapeHTML(title)}"><div class="sheet-head"><h3>${escapeHTML(title)}</h3><button class="btn btn-icon btn-small btn-ghost" data-action="close-modal" aria-label="Schließen">×</button></div><div class="sheet-body">${body}</div>${foot?`<div class="sheet-foot">${foot}</div>`:''}</section></div>`;}
 function checklist(ids){const selected=new Set(ids);return `<div class="select-exercises">${allExercises().map(ex=>`<label class="select-ex"><input type="checkbox" data-select-ex="${ex.id}" ${selected.has(ex.id)?'checked':''}>${artBox(ex)}<span class="grow"><strong>${escapeHTML(ex.name)}</strong><small>${escapeHTML(ex.group)} · ${escapeHTML(ex.equipment)}</small></span></label>`).join('')}</div>`;}
-function renderModal(){const root=el('modal-root');if(!modal){root.innerHTML='';return;}if(modal.type==='choosePlan'){const p=data.plans.find(p=>p.id===modal.planId)||data.plans[0];root.innerHTML=modalMarkup('Trainingsplan wählen',`<div class="field"><label for="choose-plan">Plan</label><select id="choose-plan" class="input">${data.plans.map(p=>`<option value="${p.id}" ${p.id===modal.planId?'selected':''}>${escapeHTML(p.name)}</option>`).join('')}</select></div><p class="modal-help">Wähle vor dem Start Übungen an oder ab. Bereits eingetragene Übungen an diesem Tag werden nicht gelöscht.</p>${checklist(modal.ids)}`,`<button class="btn btn-primary btn-block" data-action="apply-plan" ${modal.ids.length?'':'disabled'}>Mit ${modal.ids.length} Übungen übernehmen</button>`);}else if(modal.type==='editPlan'){const p=modal.draft;root.innerHTML=modalMarkup(modal.isNew?'Trainingsplan erstellen':'Trainingsplan bearbeiten',`<div class="field"><label for="plan-name">Name des Plans</label><input class="input" id="plan-name" maxlength="50" value="${escapeHTML(p.name)}" placeholder="z. B. Oberkörper A"></div><p class="modal-help">Lege fest, welche Übungen standardmäßig in deinem Plan enthalten sind. Vor jedem Training kannst du die Auswahl ändern.</p>${checklist(p.exerciseIds)}`,`<div class="btn-wrap"><button class="btn btn-primary grow" data-action="save-plan">Plan speichern</button>${!modal.isNew?`<button class="btn btn-red" data-action="delete-plan">Löschen</button>`:''}</div>`);}else if(modal.type==='infoExercise'){const ex=getEx(modal.exId);root.innerHTML=modalMarkup(ex.name,`<div style="max-width:410px;margin:0 auto 15px;height:220px" class="library-art">${art(ex.art)}</div><div class="row" style="margin-bottom:10px"><span class="tag">${escapeHTML(ex.group)}</span><span class="tag">${escapeHTML(ex.equipment)}</span></div><p class="intro">${escapeHTML(EXERCISE_TIPS[ex.id]||'Individuell angelegte Übung. Achte auf die Gerätebeschriftung im Studio und eine kontrollierte Ausführung.')}</p><p class="modal-help">Die Zeichnung dient nur zur Orientierung und ersetzt keine Übungsanleitung durch eine Fachperson.</p>`,`<button class="btn btn-primary btn-block" data-action="info-add" data-ex="${escapeHTML(ex.id)}">＋ Für ${shortDate(selectedDate)} hinzufügen</button>`);}else if(modal.type==='customExercise'){root.innerHTML=modalMarkup('Eigene Übung erstellen',`<div class="stack"><div class="field"><label for="custom-name">Übungsname</label><input class="input" id="custom-name" maxlength="60" placeholder="z. B. Hackenschmidt-Presse"></div><div class="field"><label for="custom-group">Muskelgruppe</label><select class="input" id="custom-group">${GROUPS.slice(1).map(g=>`<option>${g}</option>`).join('')}</select></div><div class="field"><label for="custom-kind">Art</label><select class="input" id="custom-kind"><option>Maschine</option><option>Freihantel</option><option>Kabelzug</option><option>Körpergewicht</option><option>Gerät</option><option>Outdoor</option></select></div><div class="notice">Für eigene Übungen wird eine passende schematische Standardillustration angezeigt.</div></div>`,`<button class="btn btn-primary btn-block" data-action="save-custom">Übung erstellen & hinzufügen</button>`);}else if(modal.type==='booster'){root.innerHTML=modalMarkup('Booster-Pack geöffnet',`<div class="notice" style="margin-top:0">Glückwunsch! Für dein vollständiges Workout am ${shortDate(modal.date)} wurde ein neuer Gegenstand freigeschaltet.</div>${renderBoosterItems(modal.itemIds)}<p class="intro" style="margin-top:14px">Der Gegenstand wurde deinem Inventar hinzugefügt und können im Mini-Gym platziert werden.</p>`,`<div class="btn-wrap"><button class="btn btn-primary grow" data-action="booster-to-stats">Zum Mini-Gym</button><button class="btn grow" data-action="close-modal">Weiter</button></div>`);}else if(modal.type==='changePassword'){root.innerHTML=modalMarkup('Passwort ändern',`<div class="stack"><div class="field"><label for="pw-current">Aktuelles Profilpasswort</label><input id="pw-current" class="input" type="password" autocomplete="current-password"></div><div class="field"><label for="pw-new">Neues Profilpasswort (mind. 8 Zeichen)</label><input id="pw-new" class="input" type="password" minlength="8" autocomplete="new-password"></div><div class="field"><label for="pw-confirm">Neues Passwort wiederholen</label><input id="pw-confirm" class="input" type="password" minlength="8" autocomplete="new-password"></div></div>`,`<button class="btn btn-primary btn-block" data-action="save-password">Passwort ändern</button>`);}}
+function renderModal(){const root=el('modal-root');if(!modal){root.innerHTML='';return;}if(modal.type==='choosePlan'){const p=data.plans.find(p=>p.id===modal.planId)||data.plans[0];root.innerHTML=modalMarkup('Trainingsplan wählen',`<div class="field"><label for="choose-plan">Plan</label><select id="choose-plan" class="input">${data.plans.map(p=>`<option value="${p.id}" ${p.id===modal.planId?'selected':''}>${escapeHTML(p.name)}</option>`).join('')}</select></div><p class="modal-help">Wähle vor dem Start Übungen an oder ab. Bereits eingetragene Übungen an diesem Tag werden nicht gelöscht.</p>${checklist(modal.ids)}`,`<button class="btn btn-primary btn-block" data-action="apply-plan" ${modal.ids.length?'':'disabled'}>Mit ${modal.ids.length} Übungen übernehmen</button>`);}else if(modal.type==='editPlan'){const p=modal.draft;root.innerHTML=modalMarkup(modal.isNew?'Trainingsplan erstellen':'Trainingsplan bearbeiten',`<div class="field"><label for="plan-name">Name des Plans</label><input class="input" id="plan-name" maxlength="50" value="${escapeHTML(p.name)}" placeholder="z. B. Oberkörper A"></div><p class="modal-help">Lege fest, welche Übungen standardmäßig in deinem Plan enthalten sind. Vor jedem Training kannst du die Auswahl ändern.</p>${checklist(p.exerciseIds)}`,`<div class="btn-wrap"><button class="btn btn-primary grow" data-action="save-plan">Plan speichern</button>${!modal.isNew?`<button class="btn btn-red" data-action="delete-plan">Löschen</button>`:''}</div>`);}else if(modal.type==='infoExercise'){const ex=getEx(modal.exId);root.innerHTML=modalMarkup(ex.name,`<div style="max-width:410px;margin:0 auto 15px;height:220px" class="library-art">${art(ex.art)}</div><div class="row" style="margin-bottom:10px"><span class="tag">${escapeHTML(ex.group)}</span><span class="tag">${escapeHTML(ex.equipment)}</span></div><p class="intro">${escapeHTML(EXERCISE_TIPS[ex.id]||'Individuell angelegte Übung. Achte auf die Gerätebeschriftung im Studio und eine kontrollierte Ausführung.')}</p><p class="modal-help">Die Zeichnung dient nur zur Orientierung und ersetzt keine Übungsanleitung durch eine Fachperson.</p>`,`<button class="btn btn-primary btn-block" data-action="info-add" data-ex="${escapeHTML(ex.id)}">＋ Für ${shortDate(selectedDate)} hinzufügen</button>`);}else if(modal.type==='customExercise'){root.innerHTML=modalMarkup('Eigene Übung erstellen',`<div class="stack"><div class="field"><label for="custom-name">Übungsname</label><input class="input" id="custom-name" maxlength="60" placeholder="z. B. Hackenschmidt-Presse"></div><div class="field"><label for="custom-group">Muskelgruppe</label><select class="input" id="custom-group">${GROUPS.slice(1).map(g=>`<option>${g}</option>`).join('')}</select></div><div class="field"><label for="custom-kind">Art</label><select class="input" id="custom-kind"><option>Maschine</option><option>Freihantel</option><option>Kabelzug</option><option>Körpergewicht</option><option>Gerät</option><option>Outdoor</option></select></div><div class="notice">Für eigene Übungen wird eine passende schematische Standardillustration angezeigt.</div></div>`,`<button class="btn btn-primary btn-block" data-action="save-custom">Übung erstellen & hinzufügen</button>`);}else if(modal.type==='booster'){root.innerHTML=modalMarkup('Booster-Pack geöffnet',`<div class="notice" style="margin-top:0">Glückwunsch! Für dein vollständiges Workout am ${shortDate(modal.date)} wurde ein neuer Gegenstand freigeschaltet.</div>${renderBoosterItems(modal.itemIds)}<p class="intro" style="margin-top:14px">Das Objekt liegt dauerhaft in deiner Sammlung. Wähle es im Mini-Gym aus und platziere es mit dem Finger.</p>`,`<div class="btn-wrap"><button class="btn btn-primary grow" data-action="booster-to-stats">Zum Mini-Gym</button><button class="btn grow" data-action="close-modal">Weiter</button></div>`);}else if(modal.type==='changePassword'){root.innerHTML=modalMarkup('Passwort ändern',`<div class="stack"><div class="field"><label for="pw-current">Aktuelles Profilpasswort</label><input id="pw-current" class="input" type="password" autocomplete="current-password"></div><div class="field"><label for="pw-new">Neues Profilpasswort (mind. 8 Zeichen)</label><input id="pw-new" class="input" type="password" minlength="8" autocomplete="new-password"></div><div class="field"><label for="pw-confirm">Neues Passwort wiederholen</label><input id="pw-confirm" class="input" type="password" minlength="8" autocomplete="new-password"></div></div>`,`<button class="btn btn-primary btn-block" data-action="save-password">Passwort ändern</button>`);}}
 function refreshModalKeepScroll(){const old=$('.sheet-body')?.scrollTop||0;renderModal();if($('.sheet-body'))$('.sheet-body').scrollTop=old;}
 function setDay(date){if(!/^\d{4}-\d{2}-\d{2}$/.test(date)||Number.isNaN(new Date(date+'T12:00:00').getTime()))return;selectedDate=date;activeTab='today';render();}
 function switchTab(tab){activeTab=tab;render();window.scrollTo({top:0,behavior:'instant'});}
@@ -726,9 +702,9 @@ async function handleClick(event){const btn=event.target.closest('[data-action]'
   case 'copy-prior-cardio':{const ex=session()?.exercises.find(e=>e.id===btn.dataset.ex);if(!ex)break;const changed=applyPriorCardio(ex);if(changed){render();toast('Letzte fehlende Cardio-Werte übernommen');}else toast('Keine fehlenden Werte – einzeln antippen zum Ersetzen');break;}
   case 'copy-prior-cardio-field':{const ex=session()?.exercises.find(e=>e.id===btn.dataset.ex),field=btn.dataset.field;if(!ex||!['duration','distance','calories'].includes(field))break;const changed=applyPriorCardio(ex,field);if(changed){render();toast('Letzten Wert übernommen');}break;}
   case 'finish-cardio':{const ex=session()?.exercises.find(e=>e.id===btn.dataset.ex);if(!ex)break;const c=cardioShape(ex);if(!cardioValid(ex)){toast('Bitte mindestens eine gültige Dauer in Minuten eintragen');break;}c.completed=true;c.recordedAt=new Date().toISOString();session().updatedAt=c.recordedAt;save();const unlocked=maybeUnlockBooster(session());render();toast(unlocked?'Training vollständig – Booster freigeschaltet':'Cardio-Einheit abgeschlossen und gespeichert');break;}
-  case 'select-item':{const id=btn.dataset.item;gymSelectedItemId=gymSelectedItemId===id?null:id;render();break;}
-  case 'gym-slot':{const slot=Number(btn.dataset.slot);if(!Number.isFinite(slot))break;if(gymSelectedItemId){placeItemAtSlot(gymSelectedItemId,slot);const placedName=boosterItem(gymSelectedItemId).name;gymSelectedItemId=null;save();render();toast(`${placedName} platziert`);}else if(data.gymLayout?.[slot]){const removed=boosterItem(data.gymLayout[slot]).name;data.gymLayout[slot]=null;save();render();toast(`${removed} entfernt`);}break;}
-  
+  case 'gym-choose-item':{gymSelectedItemId=gymSelectedItemId===btn.dataset.item?null:btn.dataset.item;gymFocusedPlacedId=null;render();requestAnimationFrame(()=>el('mini-world-canvas')?.scrollIntoView({behavior:'smooth',block:'center'}));break;}
+  case 'gym-reset-select':gymSelectedItemId=null;gymFocusedPlacedId=null;render();break;
+  case 'gym-remove-selected':{if(!gymFocusedPlacedId)break;data.gymWorld.items=data.gymWorld.items.filter(p=>p.id!==gymFocusedPlacedId);gymFocusedPlacedId=null;save();render();break;}
   case 'set-wall':data.gymDesign={...(data.gymDesign||{}),wall:btn.dataset.value};save();render();break;
   case 'set-floor':data.gymDesign={...(data.gymDesign||{}),floor:btn.dataset.value};save();render();break;
   case 'set-scene':data.gymDesign={...(data.gymDesign||{}),scene:btn.dataset.value};save();render();break;

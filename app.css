@@ -200,3 +200,39 @@ body{background:radial-gradient(circle at 15% 0%,rgba(173,140,106,.18),transpare
 .cardio-completion>.small{margin-bottom:9px;font-weight:700}
 .cardio-completion>p{margin:9px 0 0;line-height:1.45}
 @media(min-width:540px){.cardio-card .cardio-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+
+/* KRAFTLOG 6 · spielbare isometrische Miniaturwelt, statt Platzhalter-Kacheln */
+.app-shell:has(.mini-world-layout){max-width:1120px}
+.gym-banner{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 16px}
+.gym-banner span{background:#e8d9c7;color:#644731;border:1px solid #d8bea4;border-radius:24px;font-size:12px;font-weight:800;padding:9px 13px}
+.mini-world-layout{display:flex;flex-direction:column;gap:16px;margin-bottom:22px}
+.mini-world-board{background:#f7eee2;border:1px solid #d9c5ad;border-radius:29px;padding:13px;box-shadow:0 23px 70px rgba(67,41,22,.13);overflow:hidden}
+.mini-world-title{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:5px 9px 13px}
+.mini-world-title .eyebrow{color:#8b6d54}
+.mini-world-title h3{margin:2px 0 0;font-size:20px;letter-spacing:-.5px}
+.mini-world-frame{position:relative;overflow:hidden;border-radius:21px;background:#e7d8c6;border:1px solid #cfb79d;isolation:isolate}
+#mini-world-canvas{display:block;width:100%;height:auto;aspect-ratio:960 / 690;touch-action:none;user-select:none;-webkit-user-select:none;cursor:grab}
+#mini-world-canvas:active{cursor:grabbing}
+.mini-world-help{position:absolute;left:8px;right:8px;bottom:8px;z-index:2;background:rgba(255,250,242,.91);backdrop-filter:blur(9px);border:1px solid rgba(135,99,68,.2);border-radius:15px;padding:9px 13px;color:#644d3a;font-size:11px;line-height:1.4;pointer-events:none;text-align:center}
+.mini-world-actions{display:flex;gap:9px;padding:13px 4px 1px;flex-wrap:wrap}
+.mini-world-actions .btn{flex:1;min-width:110px}
+.mini-world-design,.mini-world-collection{border-radius:24px;padding:17px}
+.mini-world-design .section-header{margin:0 0 11px}
+.mini-design-row{padding:10px 0;border-top:1px solid #e7d8c6}
+.mini-design-row .small{display:block;margin-bottom:8px;font-size:11px;font-weight:800;letter-spacing:.5px;text-transform:uppercase}
+.mini-design-row .filters{padding-bottom:2px}
+.mini-inventory-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.mini-inventory-item{appearance:none;display:flex;flex-direction:column;align-items:flex-start;text-align:left;gap:6px;min-width:0;padding:8px;border-radius:17px;background:#fffaf4;color:#3e2d21;border:1px solid #dfcbb6;box-shadow:0 3px 12px rgba(72,50,31,.05)}
+.mini-inventory-item img{display:block;width:100%;aspect-ratio:1;object-fit:cover;border-radius:12px;border:1px solid #e1d2bf}
+.mini-inventory-item strong{font-size:12px;line-height:1.24;display:block;min-height:28px}
+.mini-inventory-item small{color:#876c55;font-size:10px}
+.mini-inventory-item.selected{background:#ebdbc8;border:2px solid #8b6346;padding:7px;box-shadow:0 0 0 2px rgba(139,99,70,.08)}
+.mini-collection-empty{grid-column:1/-1;text-align:center;padding:38px 15px;background:#f4e8db;border-radius:18px}
+.mini-collection-empty p{color:#796655;font-size:13px}
+.modern-loot{min-width:0;width:100%;background:#fff7ed;padding:12px;text-align:center;align-items:center;border:1px solid #e5c7a6}
+.modern-loot .loot-thumb{display:block;width:min(100%,250px);aspect-ratio:1;object-fit:cover;border-radius:19px;margin:0 auto 12px;border:1px solid #e5d7c7}
+.modern-loot strong{font-size:18px}
+.modern-loot small{font-size:12px}
+@media(min-width:620px){.mini-inventory-grid{grid-template-columns:repeat(4,minmax(0,1fr))}.mini-world-board{padding:20px}.mini-world-help{left:50%;transform:translateX(-50%);right:auto;bottom:14px;min-width:min(90%,450px)}.mini-world-title h3{font-size:25px}}
+@media(min-width:900px){.mini-inventory-grid{grid-template-columns:repeat(5,minmax(0,1fr))}}
+@media(max-width:380px){.mini-world-board{padding:8px;border-radius:20px}.mini-world-frame{border-radius:12px}.mini-world-help{font-size:10px}.mini-inventory-grid{gap:7px}.mini-inventory-item{padding:6px}}
